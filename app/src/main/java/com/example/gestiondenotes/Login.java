@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -24,8 +25,8 @@ import static android.util.Patterns.EMAIL_ADDRESS;
 public class Login extends AppCompatActivity {
     EditText email_ed;
     EditText pass_ed;
-    TextView login_btn,
-            singup_btn;
+    TextView  singup_btn;
+    FloatingActionButton login_btn ;
     FirebaseAuth mAuth;
     ProgressDialog progressDialog;
 
@@ -63,24 +64,23 @@ public class Login extends AppCompatActivity {
             }
         });
     }
-
     public void signin(String email, String password) {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Attendez s'il vous plait");
+        progressDialog.show();
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                                                                     @Override
                                                                                     public void onComplete(@NonNull Task<AuthResult> task) {
-                                                                                        progressDialog.dismiss();
-                                                                                        if (task.isSuccessful()) {
-                                                                                            Intent i = new Intent(Login.this, MainActivity.class);
-              startActivity(i);
-                                                                                            finish();
-                                                                                        } else {
-                     Toast.makeText(Login.this, task.getException().toString(), Toast.LENGTH_SHORT).show();
-                                                                                        }
+        progressDialog.dismiss();
+        if (task.isSuccessful()) {
+          Intent i = new Intent(Login.this, MainActivity.class);
+          startActivity(i);
+         finish();
+      } else {
+            Toast.makeText(Login.this, task.getException().getMessage().toString(), Toast.LENGTH_SHORT).show();
+        }
                                                                                     }
-                                                                                }
-        );
+                                                                                });
     }
 
 }
