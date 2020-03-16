@@ -2,6 +2,12 @@ package com.example.gestiondenotes;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.BaseTransientBottomBar;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.database.FirebaseDatabase;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -24,6 +31,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+
 
 public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth ;
@@ -93,42 +101,47 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // dialog affichage
-                final AlertDialog.Builder Dialog = new AlertDialog.Builder(MainActivity.this);
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(MainActivity.this);
                 View mView = getLayoutInflater().inflate(R.layout.dialog_add_module, null);
-                Dialog.setTitle("Ajouter un module");
-                final EditText Nom_du_module = mView.findViewById(R.id.nom_du_module_dialog_bar);
-                final EditText Note_eliminatoire_du_module = mView.findViewById(R.id.note_eliminatoire_du_module);
-                final EditText Coefficient_du_module = mView.findViewById(R.id.coefficient_du_module);
-                Dialog.setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
+                builder.setTitle("Ajouter un module");
+                builder.setIcon(R.drawable.add_dialog);
+                builder.setBackground(getResources().getDrawable(R.drawable.design_alert_dialog));
+                final TextInputEditText Nom_du_module = mView.findViewById(R.id.nom_du_module_dialog_bar);
+                final TextInputEditText Note_eliminatoire_du_module = mView.findViewById(R.id.note_eliminatoire_du_module);
+                final TextInputEditText Coefficient_du_module = mView.findViewById(R.id.coefficient_du_module);
+                builder.setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog, int which) {
                         final String Nom = Nom_du_module.getText().toString().trim();
                         final String Noteelim = Note_eliminatoire_du_module.getText().toString().trim();
                         final String coeff = Coefficient_du_module.getText().toString().trim();
 
-                        if (Nom.isEmpty()) {
-                            Nom_du_module.setError("vous devez remplir ce champ");
-                            Nom_du_module.requestFocus();
+                        if (Nom.isEmpty() || Noteelim.isEmpty() || coeff.isEmpty()) {
+                            final Snackbar s =  Snackbar.make(findViewById(android.R.id.content),
+                                    "Vous devez remplir les champs", Snackbar.LENGTH_LONG);
+                            s.setDuration(10000);
+                            s.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
+                            s.setBackgroundTint(getResources().getColor(R.color.colorAccent));
+                            s.setTextColor(getResources().getColor(R.color.colorPrimary));
+                            s.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+                            s.setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    s.dismiss(); }
+                            });
+                            s.show();
                             return;
-                        } if (Noteelim.isEmpty()) {
-                            Note_eliminatoire_du_module.setError("Vous devez remplir ce champ");
-                            Note_eliminatoire_du_module.requestFocus();
-                            return;
-                        } if (coeff.isEmpty()) {
-                            Coefficient_du_module.setError("Vous devez remplir ce champ");
-                            Coefficient_du_module.requestFocus();
-                            return; }
-
-                            add_groupe(Nom,Noteelim,coeff); }
+                         }
+                        add_groupe(Nom,Noteelim,coeff); }
                 });
-                Dialog.setNegativeButton("Quitter", new DialogInterface.OnClickListener() {
+                builder.setNegativeButton("Quitter", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss(); }
+                        dialog.dismiss();
+                    }
                 });
-                Dialog.setView(mView);
-                AlertDialog dialog = Dialog.create();
-                dialog.show();
+                builder.setView(mView);
+                builder.show();
             }
         }); }
         // insertion
@@ -137,7 +150,29 @@ public class MainActivity extends AppCompatActivity {
          String key = mDatabase.child("Module_users").push().getKey();
          module_users.setId(key);
         mDatabase.child("Module_users").child(mAuth.getCurrentUser().getUid()).child(key).
-                setValue(module_users);
+                setValue(module_users).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+              if (task.isSuccessful()) {
+              final Snackbar s =  Snackbar.make(findViewById(android.R.id.content),"Module est inserer", Snackbar.LENGTH_LONG);
+              s.setDuration(10000);
+                  s.setActionTextColor(getResources().getColor(R.color.colorAccent));
+                  s.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
+                  s.setBackgroundTint(getResources().getColor(R.color.colorAccent));
+                  s.setTextColor(getResources().getColor(R.color.colorPrimary));
+              s.setAction("OK", new View.OnClickListener() {
+                  @Override
+                  public void onClick(View v) {
+                      s.dismiss();
+                  }
+              });
+         s.show();
+              } else {
+                  Snackbar s =  Snackbar.make(findViewById(android.R.id.content),task.getException().getMessage(), Snackbar.LENGTH_LONG);
+                  s.show();
+              }
+            }
+        });
     }
 
 }
