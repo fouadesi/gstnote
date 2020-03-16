@@ -1,0 +1,2614 @@
+Index: app/src/main/java/com/example/gestiondenotes/FirebaseDatabaseHelper.java
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/FirebaseDatabaseHelper.java	(date 1583862290000)
++++ app/src/main/java/com/example/gestiondenotes/FirebaseDatabaseHelper.java	(date 1583862290000)
+@@ -1,52 +0,0 @@
+-package com.example.gestiondenotes;
+-
+-import android.provider.ContactsContract;
+-
+-import androidx.annotation.NonNull;
+-
+-import com.google.firebase.auth.FirebaseAuth;
+-import com.google.firebase.database.DataSnapshot;
+-import com.google.firebase.database.DatabaseError;
+-import com.google.firebase.database.DatabaseReference;
+-import com.google.firebase.database.FirebaseDatabase;
+-import com.google.firebase.database.ValueEventListener;
+-
+-import java.util.ArrayList;
+-import java.util.List;
+-
+-public class FirebaseDatabaseHelper {
+-    private FirebaseDatabase mDatabase ;
+-    private DatabaseReference databaseReference;
+-    private List<groupeModel> groups = new ArrayList<groupeModel> ();
+-    public FirebaseDatabaseHelper() {
+-        mDatabase = FirebaseDatabase.getInstance();
+-        databaseReference = mDatabase.getReference("Groupes_Users");
+-    }
+-    public interface Datastatut {
+-        void Dataloaded(List<groupeModel> groups,List<String> keys );
+-        void DataInserted();
+-        void DataDeleted();
+-        void DataUpdated();
+-
+-    }
+-    public void readgroupes(final Datastatut datastatut) {
+-        databaseReference.addValueEventListener(new ValueEventListener() {
+-            @Override
+-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+-                groups.clear();
+-                List<String> keys = new ArrayList<>() ;
+-              for( DataSnapshot keynode : dataSnapshot.getChildren()) {
+-                  keys.add(keynode.getKey()) ;
+-                 groupeModel group = keynode.getValue(groupeModel.class);
+-                 groups.add(group) ;
+-              }
+-              datastatut.Dataloaded(groups,keys);
+-            }
+-
+-            @Override
+-            public void onCancelled(@NonNull DatabaseError databaseError) {
+-
+-            }
+-        });
+-    }
+-}
+Index: app/src/main/java/com/example/gestiondenotes/groupeModel.java
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/groupeModel.java	(date 1583862290000)
++++ app/src/main/java/com/example/gestiondenotes/groupeModel.java	(date 1583862290000)
+@@ -1,30 +0,0 @@
+-package com.example.gestiondenotes;
+-
+-public class groupeModel {
+-    private String Nom_du_groupe ;
+-    private String Nom_du_Module;
+-    private String Annee;
+-
+-    public groupeModel(String nom_du_groupe, String nom_du_module, String Annee) {
+-        this.Nom_du_groupe = nom_du_groupe;
+-        this.Nom_du_Module = nom_du_module;
+-        this.Annee = Annee;
+-    }
+-
+-
+-
+-
+-    public String getAnnee() {
+-        return Annee;
+-    }
+-
+-    public String getNom_du_groupe() {
+-        return Nom_du_groupe;
+-    }
+-
+-    public String getNom_du_Module() {
+-        return Nom_du_Module;
+-    }
+-
+-    }
+-
+Index: app/src/main/java/com/example/gestiondenotes/MainActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/MainActivity.java	(date 1583862290000)
++++ app/src/main/java/com/example/gestiondenotes/MainActivity.java	(date 1584357180877)
+@@ -1,122 +1,143 @@
+ package com.example.gestiondenotes;
+ import android.content.DialogInterface;
+ import android.content.Intent;
++
+ import com.google.firebase.database.FirebaseDatabase;
+ import android.os.Bundle;
++import android.view.Menu;
++import android.view.MenuInflater;
++import android.view.MenuItem;
+ import android.view.View;
+-import android.widget.ArrayAdapter;
++import android.widget.Button;
+ import android.widget.EditText;
+ import android.widget.ListView;
+-import android.widget.Toast;
++
+ import androidx.annotation.NonNull;
+-import androidx.annotation.Nullable;
+ import androidx.appcompat.app.AlertDialog;
+ import androidx.appcompat.app.AppCompatActivity;
+-import androidx.recyclerview.widget.RecyclerView;
++
+ import com.google.android.material.floatingactionbutton.FloatingActionButton;
+ import com.google.firebase.auth.FirebaseAuth;
+-import com.google.firebase.database.ChildEventListener;
+ import com.google.firebase.database.DataSnapshot;
+ import com.google.firebase.database.DatabaseError;
+ import com.google.firebase.database.DatabaseReference;
++import com.google.firebase.database.ValueEventListener;
++
+ import java.util.ArrayList;
+-import java.util.HashMap;
+-import java.util.Map;
++
+ public class MainActivity extends AppCompatActivity {
+-
+     private FirebaseAuth mAuth ;
+-    private  FirebaseDatabase database;
+-    private  DatabaseReference reference ;
+     private FloatingActionButton add_groupe_btn;
+-    private DatabaseReference fAuth;
+     private ListView listView;
+-    private RecyclerView recyclerView ;
+-    String uid ;
+-    ArrayList<String> arrayList= new ArrayList<>() ;
++    private Button btn ;
++    DatabaseReference mDatabase ;
++    ArrayList<Module_users> module_users ;
++
++    @Override
++    public boolean onCreateOptionsMenu(Menu menu) {
++        MenuInflater menuInflater = getMenuInflater();
++        menuInflater.inflate(R.menu.ex_menu,menu);
++        return true ; }
++    @Override
++    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
++        switch(item.getItemId()) {
++            case R.id.Disconnect: {
++
++                mAuth.signOut();
++                Intent i = new  Intent (MainActivity.this,Login.class);
++                startActivity(i);
++                finish();
++                break;
++            }
++        }
++        return true;
++    }
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_main);
+         mAuth = FirebaseAuth.getInstance();
+-        if(mAuth.getCurrentUser() == null) {
+-            Intent i = new Intent(MainActivity.this,Login.class);
++        // tester l'utilisateur si il est connecte
++        if (mAuth.getCurrentUser() == null) {
++            Intent i = new Intent(MainActivity.this, Login.class);
+             startActivity(i);
+             finish();
+         }
+         listView = findViewById(R.id.listview);
+-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(MainActivity.this,
+-                android.R.layout.simple_list_item_1,arrayList) ;
+-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+-            DatabaseReference reference = database.getReference("Module_Users");
+-        reference.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).addChildEventListener(new ChildEventListener() {
+-            @Override
+-            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+-                String Value = "";
+-                String module = dataSnapshot.child("Nom_du_module").getValue(String.class);
+-                Value += "Module   : " + module ;
+-                arrayList.add(Value);
+-                arrayAdapter.notifyDataSetChanged();
+-            }
+-            @Override
+-            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+-                arrayAdapter.notifyDataSetChanged();
+-            }
++ /// Affichage des modules
++        DatabaseReference db_ref = FirebaseDatabase.getInstance().
++                getReference().child("Module_users").child(mAuth.getCurrentUser().getUid());
++        db_ref.addValueEventListener(new ValueEventListener() {
+             @Override
+-            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+-                arrayAdapter.notifyDataSetChanged();
+-
+-            }
+-            @Override
+-            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+-                arrayAdapter.notifyDataSetChanged();
+-
++            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
++                module_users= new ArrayList<>();
++                for (DataSnapshot dataSnapshot1:dataSnapshot.getChildren()) {
++                    Module_users m = dataSnapshot1.getValue(Module_users.class);
++                   module_users.add(m);
++               }
++               moduleadapter adapter =new moduleadapter(MainActivity.this,module_users);
++                listView.setAdapter(adapter);
+             }
+             @Override
+             public void onCancelled(@NonNull DatabaseError databaseError) {
+-                arrayAdapter.notifyDataSetChanged();
+-            }
+-        });
++
++            }});
++        // relier l'adapter avec les donnes
++        moduleadapter adapter= new moduleadapter(this,module_users);
++        adapter.notifyDataSetChanged();
++
++        mDatabase = FirebaseDatabase.getInstance().getReference();
++
+         add_groupe_btn = findViewById(R.id.floating_action_button_add_groupe);
+         add_groupe_btn.setOnClickListener(new View.OnClickListener() {
+             @Override
+             public void onClick(View v) {
++                // dialog affichage
+                 final AlertDialog.Builder Dialog = new AlertDialog.Builder(MainActivity.this);
+-                View mView = getLayoutInflater().inflate(R.layout.dialog_add_groupe,null);
+-                Dialog.setTitle("Ajouter un module") ;
+-                final EditText nom_du_groupe = mView.findViewById(R.id.nom_du_groupe_dialog_bar);
++                View mView = getLayoutInflater().inflate(R.layout.dialog_add_module, null);
++                Dialog.setTitle("Ajouter un module");
++                final EditText Nom_du_module = mView.findViewById(R.id.nom_du_module_dialog_bar);
++                final EditText Note_eliminatoire_du_module = mView.findViewById(R.id.note_eliminatoire_du_module);
++                final EditText Coefficient_du_module = mView.findViewById(R.id.coefficient_du_module);
+                 Dialog.setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(final DialogInterface dialog, int which) {
+-                        final String nom = nom_du_groupe.getText().toString().trim();
++                        final String Nom = Nom_du_module.getText().toString().trim();
++                        final String Noteelim = Note_eliminatoire_du_module.getText().toString().trim();
++                        final String coeff = Coefficient_du_module.getText().toString().trim();
+ 
+-                        if (nom.isEmpty()) {
+-                            Toast.makeText(MainActivity.this, "Vous devez Remplir tout les champs",
+-                                    Toast.LENGTH_SHORT).show();
+-                            dialog.dismiss();
+-                        } else {
+-                            add_groupe(nom);
+-                        }
+-                    }
++                        if (Nom.isEmpty()) {
++                            Nom_du_module.setError("vous devez remplir ce champ");
++                            Nom_du_module.requestFocus();
++                            return;
++                        } if (Noteelim.isEmpty()) {
++                            Note_eliminatoire_du_module.setError("Vous devez remplir ce champ");
++                            Note_eliminatoire_du_module.requestFocus();
++                            return;
++                        } if (coeff.isEmpty()) {
++                            Coefficient_du_module.setError("Vous devez remplir ce champ");
++                            Coefficient_du_module.requestFocus();
++                            return; }
++
++                            add_groupe(Nom,Noteelim,coeff); }
+                 });
+                 Dialog.setNegativeButton("Quitter", new DialogInterface.OnClickListener() {
+                     @Override
+                     public void onClick(DialogInterface dialog, int which) {
+-                        dialog.dismiss();
+-                    }
++                        dialog.dismiss(); }
+                 });
+                 Dialog.setView(mView);
+                 AlertDialog dialog = Dialog.create();
+                 dialog.show();
+             }
+-        });
+-        listView.setAdapter(arrayAdapter);
++        }); }
++        // insertion
++    void add_groupe(String nom,String Note_eliminatoire, String Coeff) {
++         Module_users module_users = new Module_users(nom,Note_eliminatoire,Coeff);
++         String key = mDatabase.child("Module_users").push().getKey();
++         module_users.setId(key);
++        mDatabase.child("Module_users").child(mAuth.getCurrentUser().getUid()).child(key).
++                setValue(module_users);
+     }
+-    void add_groupe(String nom) {
+-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+-        DatabaseReference fReff = FirebaseDatabase.getInstance().getReference().child("Module_Users").child(mAuth.getCurrentUser().getUid());
+-        DatabaseReference newGroupe = fReff.push();
+-        final Map groupe = new HashMap();
+-        groupe.put("Nom_du_module",nom);
+-        newGroupe.setValue(groupe);
+-    }
++
+ }
+\ No newline at end of file
+Index: app/src/main/res/font/dorsa.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/font/dorsa.xml	(date 1584180294201)
++++ app/src/main/res/font/dorsa.xml	(date 1584180294201)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
++        app:fontProviderAuthority="com.google.android.gms.fonts"
++        app:fontProviderPackage="com.google.android.gms"
++        app:fontProviderQuery="Dorsa"
++        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
++</font-family>
+Index: app/src/main/res/values/preloaded_fonts.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/preloaded_fonts.xml	(date 1583862290000)
++++ app/src/main/res/values/preloaded_fonts.xml	(date 1584268413550)
+@@ -1,6 +1,9 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+     <array name="preloaded_fonts" translatable="false">
++        <item>@font/dorsa</item>
++        <item>@font/fredoka_one</item>
+         <item>@font/life_savers</item>
++        <item>@font/secular_one</item>
+     </array>
+ </resources>
+Index: app/src/main/res/layout/activity_main.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_main.xml	(date 1583862290000)
++++ app/src/main/res/layout/activity_main.xml	(date 1584377582492)
+@@ -2,13 +2,17 @@
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_width="match_parent"
++    xmlns:tools="http://schemas.android.com/tools"
++ android:background="@color/colorPrimary"
++    android:padding="10dp"
+     android:layout_height="match_parent">
+     <!-- Main content -->
+-   <ListView
+-       android:layout_width="wrap_content"
+-       android:layout_height="wrap_content"
+-
+-       android:id="@+id/listview" />
++    <ListView
++        android:divider="@null"
++        android:dividerHeight="0dip"
++        android:id="@+id/listview"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent"/>
+ 
+     <com.google.android.material.floatingactionbutton.FloatingActionButton
+         android:id="@+id/floating_action_button_add_groupe"
+@@ -17,8 +21,8 @@
+         android:layout_margin="15dp"
+         android:layout_alignParentBottom="true"
+         android:layout_alignParentRight="true"
+-
+         android:background="@color/colorAccent"
+         app:srcCompat="@drawable/round_add_white_36dp" />
+ 
++
+ </RelativeLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_editgroupe.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_editgroupe.xml	(date 1584359867190)
++++ app/src/main/res/layout/activity_editgroupe.xml	(date 1584359867190)
+@@ -0,0 +1,36 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:orientation="vertical"
++    android:layout_height="match_parent"
++    tools:context=".Editgroupe">
++    <EditText
++        android:layout_marginTop="20dp"
++        android:padding="10dp"
++        android:background="@drawable/search_outline"
++        android:hint="Entrer le nom du groupe "
++        android:layout_width="match_parent"
++        android:id="@+id/nom_du_groupe_edit"
++        android:layout_height="wrap_content" />
++    <EditText
++        android:padding="10dp"
++        android:background="@drawable/search_outline"
++        android:layout_marginTop="10dp"
++        android:hint="Entrer le nom du groupe "
++        android:layout_width="match_parent"
++        android:id="@+id/niveau_du_groupe_edit"
++        android:layout_height="wrap_content" />
++    <Button
++        android:background="@drawable/search_outline"
++        android:id="@+id/edit_groupe"
++        android:layout_marginTop="20dp"
++        android:text="Edit Groupe"
++        android:layout_width="200dp"
++        android:layout_height="wrap_content" />
++
++
++
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/drawable/search_outline.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/search_outline.xml	(date 1584197191037)
++++ app/src/main/res/drawable/search_outline.xml	(date 1584197191037)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<shape xmlns:android="http://schemas.android.com/apk/res/android">
++    <stroke android:color="#95989A" android:width="1dp"/>
++    <corners android:radius="10dp" />
++
++</shape>
+\ No newline at end of file
+Index: app/src/main/res/layout/item_groupes.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/item_groupes.xml	(date 1584359449930)
++++ app/src/main/res/layout/item_groupes.xml	(date 1584359449930)
+@@ -0,0 +1,56 @@
++<?xml version="1.0" encoding="utf-8"?>
++<RelativeLayout
++    android:padding="10dp"
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content">
++    <TextView
++        android:layout_marginTop="13dp"
++        android:id="@+id/nom_du_groupe_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:fontFamily="@font/secular_one"
++        android:text="Nom :"
++        android:textColor="@android:color/black"
++        android:textSize="15sp" />
++    <TextView
++        android:fontFamily="@font/secular_one"
++        android:layout_below="@+id/nom_du_groupe_listview"
++        android:id="@+id/niveau_du_groupe_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginTop="4dp"
++        android:text="Niveau :"
++        android:textColor="@color/colorAccent"
++        android:textSize="15sp" />
++    <ImageButton
++        android:layout_marginTop="28dp"
++        android:layout_marginEnd="10dp"
++        android:layout_alignParentEnd="true"
++        android:id="@+id/delete_groupe_icon_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:background="@drawable/delete_icon" />
++    <ImageButton
++        android:layout_marginTop="28dp"
++        android:layout_marginEnd="44dp"
++        android:layout_alignParentEnd="true"
++        android:id="@+id/update_groupe_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:background="@drawable/ic_mode_edit_black_24dp" />
++    <ImageButton
++        android:layout_marginEnd="80dp"
++        android:layout_marginTop="28dp"
++        android:id="@+id/etudiant_listview"
++        android:layout_alignParentEnd="true"
++        android:layout_width="wrap_content"
++        android:background="@drawable/groupe_icon"
++        android:layout_height="wrap_content" />
++    <View
++        android:background="@color/colorAccent"
++        android:layout_marginTop="7dp"
++        android:layout_width="match_parent"
++        android:layout_below="@id/etudiant_listview"
++        android:layout_height="1dp" />
++</RelativeLayout>
+Index: app/src/main/java/com/example/gestiondenotes/EditModule.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/EditModule.java	(date 1584274038465)
++++ app/src/main/java/com/example/gestiondenotes/EditModule.java	(date 1584274038465)
+@@ -0,0 +1,65 @@
++package com.example.gestiondenotes;
++
++import androidx.annotation.NonNull;
++import androidx.appcompat.app.AppCompatActivity;
++
++import android.content.Intent;
++import android.os.Bundle;
++import android.view.View;
++import android.widget.EditText;
++import android.widget.Toast;
++
++import com.google.android.gms.tasks.OnCompleteListener;
++import com.google.android.gms.tasks.Task;
++import com.google.firebase.auth.FirebaseAuth;
++import com.google.firebase.database.DatabaseReference;
++import com.google.firebase.database.FirebaseDatabase;
++
++public class EditModule extends AppCompatActivity {
++    DatabaseReference ref ;
++    EditText nom_module_edit_text , coef_du_module_edit_text , note_eliminatoire_du_module_edit_text ;
++    String get_nom , get_coeff , get_note_elim ,id ;
++
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_edit_module);
++        ref = FirebaseDatabase.getInstance().getReference();
++        get_nom = getIntent().getExtras().getString("nom");
++        get_coeff = getIntent().getExtras().getString("coeff") ;
++        get_note_elim =getIntent().getExtras().getString("note eliminatoire");
++        id = getIntent().getExtras().getString("id");
++        nom_module_edit_text = findViewById(R.id.nom_du_module_edit) ;
++        coef_du_module_edit_text = findViewById(R.id.coefficient_du_module_edit);
++        note_eliminatoire_du_module_edit_text = findViewById(R.id.note_eliminatoire_du_module_edit);
++        nom_module_edit_text.setText(get_nom);
++        note_eliminatoire_du_module_edit_text.setText(get_note_elim);
++        coef_du_module_edit_text.setText(get_coeff); }
++    public void Update(View view) {
++        String new_nom , new_coef , new_note ;
++        new_nom = nom_module_edit_text.getText().toString();
++        new_coef = coef_du_module_edit_text.getText().toString() ;
++        new_note = note_eliminatoire_du_module_edit_text.getText().toString();
++        if (new_nom.isEmpty() || new_coef.isEmpty() || new_note.isEmpty()) {
++            Toast.makeText(EditModule.this,"Vous devez remplir tout les champs ", Toast.LENGTH_SHORT).show();
++        } else {
++            Module_users module_users = new Module_users(new_nom,new_note,new_coef);
++            module_users.setId(id);
++            ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
++                    child(id).setValue(module_users).addOnCompleteListener(new OnCompleteListener<Void>() {
++                @Override
++                public void onComplete(@NonNull Task<Void> task) {
++                 if (task.isSuccessful()) {
++                     onBackPressed();
++                 } else {
++                     Toast.makeText(EditModule.this,task.getException().getMessage(),Toast.LENGTH_SHORT ).show();
++                 }
++                }
++            });
++
++        }
++
++
++    }
++}
+Index: app/src/main/res/layout/activity_edit_module.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_edit_module.xml	(date 1584270192038)
++++ app/src/main/res/layout/activity_edit_module.xml	(date 1584270192038)
+@@ -0,0 +1,49 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:orientation="vertical"
++    android:padding="10dp"
++    android:layout_height="match_parent"
++    tools:context=".EditModule">
++
++    <EditText
++        android:layout_marginTop="20dp"
++        android:padding="15dp"
++        android:background="@drawable/search_outline"
++        android:inputType="text"
++        android:hint="Nom"
++        android:layout_width="match_parent"
++        android:id="@+id/nom_du_module_edit"
++        android:layout_height="50dp" />
++    <EditText
++        android:padding="15dp"
++        android:layout_marginTop="8dp"
++        android:background="@drawable/search_outline"
++        android:inputType="number"
++        android:hint="Coefficient"
++        android:layout_width="match_parent"
++        android:id="@+id/coefficient_du_module_edit"
++        android:layout_height="50dp" />
++    <EditText
++        android:padding="15dp"
++        android:layout_marginTop="8dp"
++        android:background="@drawable/search_outline"
++        android:inputType="number"
++        android:hint="Note eliminatoire"
++        android:layout_width="match_parent"
++        android:id="@+id/note_eliminatoire_du_module_edit"
++        android:layout_height="50dp" />
++    <Button
++        android:padding="10dp"
++        android:fontFamily="@font/secular_one"
++        android:text="Sauvgarder"
++        android:onClick="Update"
++        android:id="@+id/sauvgarder_edit_btn"
++        android:background="@drawable/search_outline"
++        android:layout_marginTop="20dp"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content" />
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/example/gestiondenotes/Editgroupe.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/Editgroupe.java	(date 1584361776980)
++++ app/src/main/java/com/example/gestiondenotes/Editgroupe.java	(date 1584361776980)
+@@ -0,0 +1,59 @@
++package com.example.gestiondenotes;
++
++import androidx.annotation.NonNull;
++import androidx.appcompat.app.AppCompatActivity;
++import android.os.Bundle;
++import android.view.View;
++import android.widget.Button;
++import android.widget.EditText;
++import android.widget.Toast;
++import com.google.android.gms.tasks.OnCompleteListener;
++import com.google.android.gms.tasks.Task;
++import com.google.firebase.auth.FirebaseAuth;
++import com.google.firebase.database.DatabaseReference;
++import com.google.firebase.database.FirebaseDatabase;
++public class Editgroupe extends AppCompatActivity {
++    EditText nom_groupe , niveau_groupe ;
++    String nom , niveau, id_groupe ;
++    Button edit_groupe ;
++    DatabaseReference db_ref ;
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_editgroupe);
++        nom_groupe = findViewById(R.id.nom_du_groupe_edit);
++        niveau_groupe =findViewById(R.id.niveau_du_groupe_edit);
++        nom =getIntent().getExtras().getString("nom");
++        niveau = getIntent().getExtras().getString("niveau") ;
++        id_groupe = getIntent().getExtras().getString("id");
++        nom_groupe.setText(nom);
++        niveau_groupe.setText(niveau);
++        edit_groupe = findViewById(R.id.edit_groupe);
++        edit_groupe.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                nom = nom_groupe.getText().toString();
++                niveau = niveau_groupe.getText().toString();
++                if (nom.isEmpty() || niveau.isEmpty()) {
++                    Toast.makeText(Editgroupe.this,"Vous devez remplir ce champ",Toast.LENGTH_SHORT).show();
++                } else {
++                    Groupes gr = new Groupes(nom,niveau);
++                    gr.setId(id_groupe);
++                    db_ref = FirebaseDatabase.getInstance().getReference();
++                    db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child
++                            (Group_act.id_module).child("Groupes").child(id_groupe).setValue(gr).addOnCompleteListener(new OnCompleteListener<Void>() {
++                        @Override
++                        public void onComplete(@NonNull Task<Void> task) {
++                        if (task.isSuccessful()) {
++                            onBackPressed();
++                        }else {
++                            Toast.makeText(Editgroupe.this,task.getException().getMessage(),Toast.LENGTH_SHORT).show(); } }
++                    });
++                }
++
++            }
++        });
++
++
++    }
++}
+Index: app/src/main/res/font/secular_one.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/font/secular_one.xml	(date 1584268413526)
++++ app/src/main/res/font/secular_one.xml	(date 1584268413526)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
++        app:fontProviderAuthority="com.google.android.gms.fonts"
++        app:fontProviderPackage="com.google.android.gms"
++        app:fontProviderQuery="Secular One"
++        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
++</font-family>
+Index: app/src/main/java/com/example/gestiondenotes/groupesadapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/groupesadapter.java	(date 1584372104515)
++++ app/src/main/java/com/example/gestiondenotes/groupesadapter.java	(date 1584372104515)
+@@ -0,0 +1,72 @@
++package com.example.gestiondenotes;
++
++import android.content.Context;
++import android.content.Intent;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ArrayAdapter;
++import android.widget.ImageButton;
++import android.widget.TextView;
++
++import androidx.annotation.NonNull;
++
++import com.google.firebase.auth.FirebaseAuth;
++import com.google.firebase.database.DatabaseReference;
++import com.google.firebase.database.FirebaseDatabase;
++
++import java.util.ArrayList;
++
++public class groupesadapter extends ArrayAdapter<Groupes> {
++    DatabaseReference db_ref;
++
++
++    public groupesadapter(@NonNull Context context, ArrayList<Groupes> groupes) {
++        super(context, 0, groupes);
++    }
++
++    public View getView(int position, View convertView, ViewGroup parent) {
++        final Groupes groupe_users = getItem(position);
++        if (convertView == null) {
++            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_groupes, parent, false);
++        }
++        TextView nom, niveau;
++        ImageButton edit, delete, etudiant;
++        nom = (TextView) convertView.findViewById(R.id.nom_du_groupe_listview);
++        niveau = (TextView) convertView.findViewById(R.id.niveau_du_groupe_listview);
++        nom.setText("Nom : " + groupe_users.getNom());
++        niveau.setText("Note Eliminatoire : " + groupe_users.getNiveau());
++        edit = convertView.findViewById(R.id.update_groupe_listview);
++        edit.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Intent i = new Intent(getContext(), Editgroupe.class);
++                 i.putExtra("id",groupe_users.getId());
++                 i.putExtra("nom",groupe_users.getNom());
++                 i.putExtra("niveau",groupe_users.getNiveau()) ;
++                 getContext().startActivity(i);
++            }
++        });
++
++        delete = convertView.findViewById(R.id.delete_groupe_icon_listview);
++        delete.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                db_ref = FirebaseDatabase.getInstance().getReference();
++                db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(
++                        Group_act.id_module).child("Groupes").child(groupe_users.getId()).removeValue();
++            }
++        });
++        etudiant = convertView.findViewById(R.id.etudiant_listview);
++        etudiant.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Intent i = new Intent(getContext(), EtudiantAct.class);
++                i.putExtra("ID",groupe_users.getId());
++                getContext().startActivity(i);
++
++            }
++        });
++        return convertView;
++    }
++}
+Index: app/src/main/res/drawable/ic_mode_edit_black_24dp.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/ic_mode_edit_black_24dp.xml	(date 1584268705757)
++++ app/src/main/res/drawable/ic_mode_edit_black_24dp.xml	(date 1584268705757)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++        android:width="35dp"
++        android:height="35dp"
++        android:viewportWidth="24.0"
++        android:viewportHeight="24.0">
++    <path
++        android:fillColor="#FF000000"
++        android:pathData="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z"/>
++</vector>
+Index: app/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/build.gradle	(date 1583862290000)
++++ app/build.gradle	(date 1584379259017)
+@@ -25,8 +25,9 @@
+ }
+ 
+ dependencies {
++
+     implementation fileTree(dir: 'libs', include: ['*.jar'])
+-    implementation 'com.firebaseui:firebase-ui-database:2.2.0'
++    implementation 'com.firebaseui:firebase-ui-database:3.1.1'
+     implementation 'androidx.appcompat:appcompat:1.1.0'
+     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+     implementation 'com.google.firebase:firebase-database:19.2.1'
+@@ -35,6 +36,10 @@
+     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+     implementation 'com.google.android.material:material:1.1.0'
++    implementation 'androidx.recyclerview:recyclerview:1.1.0'
++    implementation 'androidx.cardview:cardview:1.0.0'
++    implementation 'com.github.clans:fab:1.6.4'
++
+ 
+ 
+ }
+Index: app/src/main/res/font/fredoka_one.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/font/fredoka_one.xml	(date 1584268294807)
++++ app/src/main/res/font/fredoka_one.xml	(date 1584268294807)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="utf-8"?>
++<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
++        app:fontProviderAuthority="com.google.android.gms.fonts"
++        app:fontProviderPackage="com.google.android.gms"
++        app:fontProviderQuery="Fredoka One"
++        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
++</font-family>
+Index: app/src/main/java/com/example/gestiondenotes/Module_users.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/Module_users.java	(date 1584225556844)
++++ app/src/main/java/com/example/gestiondenotes/Module_users.java	(date 1584225556844)
+@@ -0,0 +1,48 @@
++package com.example.gestiondenotes;
++
++public class Module_users {
++
++  private String nom ;
++  private String id ;
++  private String  note_eliminatoire ;
++  private String coef;
++
++    public String getNote_eliminatoire() {
++        return note_eliminatoire;
++    }
++
++    public String getCoef() {
++        return coef;
++    }
++    public String getId() {
++        return id;
++    }
++    public String getNom() {
++        return nom;
++    }
++
++    public void setCoef(String coef) {
++        this.coef = coef;
++    }
++
++    public void setId(String id) {
++        this.id = id;
++    }
++
++    public void setNom(String nom) {
++        this.nom = nom;
++    }
++
++    public void setNote_eliminatoire(String note_eliminatoire) {
++        this.note_eliminatoire = note_eliminatoire;
++    }
++
++    public Module_users() {
++    }
++
++    public Module_users(String nom, String note_eliminatoire, String coef) {
++        this.nom = nom;
++        this.note_eliminatoire = note_eliminatoire;
++        this.coef = coef;
++    }
++}
+Index: app/src/main/java/com/example/gestiondenotes/moduleadapter.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/moduleadapter.java	(date 1584380366401)
++++ app/src/main/java/com/example/gestiondenotes/moduleadapter.java	(date 1584380366401)
+@@ -0,0 +1,69 @@
++package com.example.gestiondenotes;
++import android.content.Context;
++import android.content.Intent;
++import android.view.LayoutInflater;
++import android.view.View;
++import android.view.ViewGroup;
++import android.widget.ArrayAdapter;
++import android.widget.EditText;
++import android.widget.ImageButton;
++import android.widget.ImageView;
++import android.widget.TextView;
++import androidx.annotation.NonNull;
++import com.google.firebase.auth.FirebaseAuth;
++import com.google.firebase.database.DatabaseReference;
++import com.google.firebase.database.FirebaseDatabase;
++import java.util.ArrayList;
++public class moduleadapter extends ArrayAdapter<Module_users> {
++    DatabaseReference db_ref ;
++
++    public moduleadapter(@NonNull Context context, ArrayList<Module_users> module_users) {
++        super(context, 0, module_users);
++    }
++
++    public View getView(int position, View convertView, ViewGroup parent) {
++        // Get the data item for this position
++        final Module_users module_users = getItem(position);
++
++        // Check if an existing view is being reused, otherwise inflate the view
++        if (convertView == null) {
++            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_module, parent, false);
++        }
++        TextView nom, note_eli, coeff;
++        ImageButton edit, delete,groupe;
++        nom = (TextView) convertView.findViewById(R.id.nom_du_module_listview);
++        note_eli = (TextView) convertView.findViewById(R.id.note_eliminatoire_du_module_listview);
++        coeff = (TextView) convertView.findViewById(R.id.coefficient_module_listview);
++        nom.setText("Nom : " +module_users.getNom());
++        note_eli.setText("Note Eliminatoire : " + module_users.getNote_eliminatoire());
++        coeff.setText("Coefficient : " + module_users.getCoef());
++        edit = (ImageButton) convertView.findViewById(R.id.update_icon_listview);
++        delete = (ImageButton) convertView.findViewById(R.id.delete_icon_listview);
++        groupe = (ImageButton) convertView.findViewById(R.id.groupes_listview) ;
++        groupe.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Intent i = new Intent(getContext(),Group_act.class);
++                i.putExtra("id",module_users.getId());
++                getContext().startActivity(i); }});
++        // update module
++        edit.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Intent i = new Intent (getContext(), EditModule.class) ;
++                i.putExtra("nom",module_users.getNom());
++                i.putExtra("coeff",module_users.getCoef());
++                i.putExtra("note eliminatoire",module_users.getNote_eliminatoire());
++                i.putExtra("id",module_users.getId());
++                getContext().startActivity(i); }});
++        delete.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                // supression
++                db_ref = FirebaseDatabase.getInstance().getReference();
++                db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(
++                        module_users.getId()).removeValue();
++            }});
++        return convertView;
++    }
++}
+Index: app/src/main/AndroidManifest.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/AndroidManifest.xml	(date 1583862290000)
++++ app/src/main/AndroidManifest.xml	(date 1584381273364)
+@@ -1,20 +1,32 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+     package="com.example.gestiondenotes">
+-
+     <application
+         android:allowBackup="true"
+         android:icon="@mipmap/ic_launcher"
+-        android:label="@string/app_name"
++        android:label="Bienvenue"
+         android:roundIcon="@mipmap/ic_launcher_round"
+         android:supportsRtl="true"
+         android:theme="@style/AppTheme">
+-        <activity android:name=".SignUpActivity" />
+-        <activity android:name=".Login" />
++        <activity
++            android:name=".EtudiantAct"
++            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
++        </activity>
++        <activity android:name=".Editgroupe"
++            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
++        <activity android:name=".Group_act"
++            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
++        <activity android:name=".EditModule"
++            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
++        <activity
++            android:name=".SignUpActivity"
++            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
++        <activity
++            android:name=".Login"
++            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+         <activity android:name=".MainActivity">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+-
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
+Index: app/src/main/res/layout/add_formule.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/add_formule.xml	(date 1584365590906)
++++ app/src/main/res/layout/add_formule.xml	(date 1584365590906)
+@@ -0,0 +1,11 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:orientation="vertical" android:layout_width="match_parent"
++    android:layout_height="match_parent">
++
++    <SeekBar
++
++        android:layout_width="match_parent"
++        android:layout_height="match_parent" />
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/item_module.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/item_module.xml	(date 1584305280034)
++++ app/src/main/res/layout/item_module.xml	(date 1584305280034)
+@@ -0,0 +1,70 @@
++<?xml version="1.0" encoding="utf-8"?>
++<RelativeLayout
++    android:padding="10dp"
++    xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="match_parent"
++    android:layout_height="wrap_content">
++
++    <TextView
++        android:id="@+id/nom_du_module_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:fontFamily="@font/secular_one"
++        android:text="Nom :"
++        android:textColor="@android:color/black"
++        android:textSize="15sp" />
++    <TextView
++        android:fontFamily="@font/secular_one"
++
++        android:layout_below="@+id/nom_du_module_listview"
++        android:id="@+id/coefficient_module_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginTop="10dp"
++        android:text="Coefficient "
++        android:textColor="@android:color/black"
++        android:textSize="15sp" />
++    <TextView
++        android:fontFamily="@font/secular_one"
++
++        android:layout_below="@+id/coefficient_module_listview"
++        android:id="@+id/note_eliminatoire_du_module_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:layout_marginTop="10dp"
++        android:text="Note eliminatoire:"
++        android:textColor="@color/colorAccent"
++        android:textSize="15sp" />
++
++
++    <ImageButton
++        android:layout_marginTop="28dp"
++        android:layout_marginEnd="10dp"
++        android:layout_alignParentEnd="true"
++        android:id="@+id/delete_icon_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:background="@drawable/delete_icon" />
++    <ImageButton
++        android:layout_marginTop="28dp"
++        android:layout_marginEnd="44dp"
++        android:layout_alignParentEnd="true"
++        android:id="@+id/update_icon_listview"
++        android:layout_width="wrap_content"
++        android:layout_height="wrap_content"
++        android:background="@drawable/ic_mode_edit_black_24dp" />
++    <ImageButton
++        android:layout_marginEnd="80dp"
++        android:layout_marginTop="28dp"
++        android:id="@+id/groupes_listview"
++        android:layout_alignParentEnd="true"
++        android:layout_width="wrap_content"
++        android:background="@drawable/groupe_icon"
++        android:layout_height="wrap_content" />
++    <View
++        android:background="@color/colorAccent"
++        android:layout_marginTop="7dp"
++        android:layout_width="match_parent"
++        android:layout_below="@id/note_eliminatoire_du_module_listview"
++        android:layout_height="1dp" />
++</RelativeLayout>
+Index: app/src/main/res/drawable/delete_icon.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/delete_icon.xml	(date 1584268714174)
++++ app/src/main/res/drawable/delete_icon.xml	(date 1584268714174)
+@@ -0,0 +1,10 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++        android:width="35dp"
++        android:height="35dp"
++
++        android:viewportWidth="24.0"
++        android:viewportHeight="24.0">
++    <path
++        android:fillColor="#FF000000"
++        android:pathData="M6,19c0,1.1 0.9,2 2,2h8c1.1,0 2,-0.9 2,-2L18,7L6,7v12zM8.46,11.88l1.41,-1.41L12,12.59l2.12,-2.12 1.41,1.41L13.41,14l2.12,2.12 -1.41,1.41L12,15.41l-2.12,2.12 -1.41,-1.41L10.59,14l-2.13,-2.12zM15.5,4l-1,-1h-5l-1,1L5,4v2h14L19,4z"/>
++</vector>
+Index: app/src/main/res/drawable/update_icon.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/update_icon.xml	(date 1584221366389)
++++ app/src/main/res/drawable/update_icon.xml	(date 1584221366389)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++        android:width="40dp"
++        android:height="40dp"
++        android:viewportWidth="24.0"
++        android:viewportHeight="24.0">
++    <path
++        android:fillColor="#FF000000"
++        android:pathData="M14,2L6,2c-1.1,0 -1.99,0.9 -1.99,2L4,20c0,1.1 0.89,2 1.99,2L18,22c1.1,0 2,-0.9 2,-2L20,8l-6,-6zM16,18L8,18v-2h8v2zM16,14L8,14v-2h8v2zM13,9L13,3.5L18.5,9L13,9z"/>
++</vector>
+Index: app/src/main/res/drawable/add_groupe_icon.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/add_groupe_icon.xml	(date 1584367151288)
++++ app/src/main/res/drawable/add_groupe_icon.xml	(date 1584367151288)
+@@ -0,0 +1,5 @@
++<vector android:height="24dp" android:tint="#FFFFFF"
++    android:viewportHeight="24.0" android:viewportWidth="24.0"
++    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
++    <path android:fillColor="#FF000000" android:pathData="M4,6L2,6v14c0,1.1 0.9,2 2,2h14v-2L4,20L4,6zM20,2L8,2c-1.1,0 -2,0.9 -2,2v12c0,1.1 0.9,2 2,2h12c1.1,0 2,-0.9 2,-2L22,4c0,-1.1 -0.9,-2 -2,-2zM19,11h-4v4h-2v-4L9,11L9,9h4L13,5h2v4h4v2z"/>
++</vector>
+Index: app/src/main/res/layout/activity_login.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_login.xml	(date 1583862290000)
++++ app/src/main/res/layout/activity_login.xml	(date 1583947061697)
+@@ -27,7 +27,6 @@
+         app:layout_constraintHorizontal_bias="0.174"
+         app:layout_constraintStart_toStartOf="parent"
+         app:layout_constraintTop_toTopOf="@+id/imageView" />
+-
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="match_parent"
+@@ -35,7 +34,6 @@
+         android:orientation="vertical"
+         tools:layout_editor_absoluteX="0dp"
+         tools:layout_editor_absoluteY="84dp">
+-
+         <EditText
+             android:id="@+id/email_edit_text"
+             android:layout_width="match_parent"
+@@ -48,7 +46,6 @@
+             android:padding="15dp"
+             android:textColor="#292929"
+             android:textColorHint="#797979" />
+-
+         <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="1dp"
+@@ -56,10 +53,8 @@
+             android:layout_marginTop="4dp"
+             android:layout_marginEnd="30dp"
+             android:background="#999999" />
+-
+         <EditText
+             android:id="@+id/pwd_edit_text"
+-
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginStart="30dp"
+@@ -68,9 +63,7 @@
+             android:hint="Password"
+             android:inputType="textPassword"
+             android:padding="15dp"
+-            android:textColor="#292929"
+-            android:textColorHint="#797979" />
+-
++            android:textColor="#292929" />
+         <RelativeLayout
+             android:layout_width="match_parent"
+             android:layout_height="1dp"
+Index: app/src/main/res/drawable/add_formule_icon.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/add_formule_icon.xml	(date 1584367502061)
++++ app/src/main/res/drawable/add_formule_icon.xml	(date 1584367502061)
+@@ -0,0 +1,5 @@
++<vector android:height="24dp" android:tint="#FFFFFF"
++    android:viewportHeight="24.0" android:viewportWidth="24.0"
++    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
++    <path android:fillColor="#FF000000" android:pathData="M19,3L5,3c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h14c1.1,0 2,-0.9 2,-2L21,5c0,-1.1 -0.9,-2 -2,-2zM9,17L7,17v-7h2v7zM13,17h-2L11,7h2v10zM17,17h-2v-4h2v4z"/>
++</vector>
+Index: app/src/main/res/drawable/ic_exit_to_app_black_24dp.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/ic_exit_to_app_black_24dp.xml	(date 1584226605229)
++++ app/src/main/res/drawable/ic_exit_to_app_black_24dp.xml	(date 1584226605229)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++        android:width="24dp"
++        android:height="24dp"
++        android:viewportWidth="24.0"
++        android:viewportHeight="24.0">
++    <path
++        android:fillColor="@color/colorPrimary"
++        android:pathData="M10.09,15.59L11.5,17l5,-5 -5,-5 -1.41,1.41L12.67,11H3v2h9.67l-2.58,2.59zM19,3H5c-1.11,0 -2,0.9 -2,2v4h2V5h14v14H5v-4H3v4c0,1.1 0.89,2 2,2h14c1.1,0 2,-0.9 2,-2V5c0,-1.1 -0.9,-2 -2,-2z"/>
++</vector>
+Index: app/src/main/res/layout/activity_etudiant.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/activity_etudiant.xml	(date 1584371753814)
++++ app/src/main/res/layout/activity_etudiant.xml	(date 1584371753814)
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="utf-8"?>
++<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    xmlns:tools="http://schemas.android.com/tools"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent"
++    tools:context=".EtudiantAct">
++
++</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/example/gestiondenotes/EtudiantAct.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/EtudiantAct.java	(date 1584371753826)
++++ app/src/main/java/com/example/gestiondenotes/EtudiantAct.java	(date 1584371753826)
+@@ -0,0 +1,14 @@
++package com.example.gestiondenotes;
++
++import androidx.appcompat.app.AppCompatActivity;
++
++import android.os.Bundle;
++
++public class EtudiantAct extends AppCompatActivity {
++
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_etudiant);
++    }
++}
+Index: app/src/main/java/com/example/gestiondenotes/model.java
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/model.java	(date 1583862290000)
++++ app/src/main/java/com/example/gestiondenotes/Etudiant.java	(date 1584379414807)
+@@ -1,5 +1,64 @@
+ package com.example.gestiondenotes;
+ 
+-public class model {
+-    
++public class Etudiant {
++ String Nom  ;
++ String Prenom ;
++ String NI ;
++ String note1 ,note2 ;
++ String ID ;
++ public String getNom() {
++  return Nom;
++ }
++
++ public String getNI() {
++  return NI;
++ }
++
++ public String getPrenom() {
++  return Prenom;
++ }
++
++ public String getID() {
++  return ID;
++ }
++
++ public String getNote1() {
++  return note1;
++ }
++
++ public String getNote2() {
++  return note2;
++ }
++
++ public void setNI(String NI) {
++  this.NI = NI;
++ }
++
++ public void setNote1(String note1) {
++  this.note1 = note1;
++ }
++
++ public void setNote2(String note2) {
++  this.note2 = note2;
++ }
++
++ public void setNom(String Nom) {
++ this.Nom = Nom;
++ }
++
++ public void setID(String ID) {
++  this.ID = ID;
++ }
++
++ public void setPrenom(String prenom) {
++  Prenom = prenom;
++ }
++
++ public Etudiant(String nom, String prenom, String NI) {
++  this.Nom = nom;
++  Prenom = prenom;
++  this.NI = NI;
++ }
++ public Etudiant() {
++ }
+ }
+Index: app/src/main/res/menu/ex_menu.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/menu/ex_menu.xml	(date 1584197977364)
++++ app/src/main/res/menu/ex_menu.xml	(date 1584197977364)
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="utf-8"?>
++<menu xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto">
++<item android:title="item1"
++    android:id="@+id/Disconnect"
++    android:icon="@drawable/ic_exit_to_app_black_24dp"
++    app:showAsAction="ifRoom"
++    />
++</menu>
+\ No newline at end of file
+Index: app/src/main/java/com/example/gestiondenotes/SignUpActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/SignUpActivity.java	(date 1583862290000)
++++ app/src/main/java/com/example/gestiondenotes/SignUpActivity.java	(date 1584141229009)
+@@ -2,16 +2,13 @@
+ import androidx.annotation.NonNull;
+ import androidx.appcompat.app.AppCompatActivity;
+ import android.app.ProgressDialog;
+-import android.app.ProgressDialog;
+ import android.content.Intent;
+ import android.os.Bundle;
+ import android.util.Patterns;
+ import android.view.View;
+-import android.widget.Button;
+ import android.widget.EditText;
+ import android.widget.TextView;
+ import android.widget.Toast;
+-import com.example.gestiondenotes.R;
+ import com.google.android.gms.tasks.OnCompleteListener;
+ import com.google.android.gms.tasks.Task;
+ import com.google.android.material.floatingactionbutton.FloatingActionButton;
+@@ -59,34 +56,27 @@
+         if (name.isEmpty()) {
+             ed_nom.setError("Vous devez remplir le champ");
+             ed_nom.requestFocus();
+-            return;
+-        }
+-
++            return; }
+         if (email.isEmpty()) {
+             ed_mail.setError("Vous devez remplir le champ");
+             ed_nom.requestFocus();
+-            return;
+-        }
++            return; }
+         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+             ed_mail.setError("Vous devez entrer un mail valid");
+             ed_mail.requestFocus();
+-            return;
+-        }
++            return; }
+         if (confpassword.isEmpty()) {
+             ed_conf_password.setError("Vous devez remplir le champ");
+             ed_conf_password.requestFocus();
+-            return;
+-        }
++            return; }
+         if (password.length() < 6 ) {
+             ed_password.setError("> 6");
+             ed_password.requestFocus();
+-            return;
+-        }
++            return; }
+         if (!password.equals(confpassword)) {
+             ed_conf_password.setError("Les mot de passe doivent etre identique");
+             ed_conf_password.requestFocus();
+-            return;
+-        }
++            return; }
+         final  ProgressDialog pr = new ProgressDialog(SignUpActivity.this) ;
+         pr.setMessage("Attendez s'il vous plait");
+         pr.show();
+Index: app/src/main/res/layout/item_formule.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/item_formule.xml	(date 1584377433638)
++++ app/src/main/res/layout/item_formule.xml	(date 1584377433638)
+@@ -0,0 +1,13 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:orientation="vertical"
++    android:layout_width="match_parent"
++    android:layout_height="match_parent">
++    <EditText
++
++        android:layout_width="100dp"
++        android:layout_height="40dp"/>
++
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/example/gestiondenotes/Formule_calcul_Note.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/Formule_calcul_Note.java	(date 1584375194444)
++++ app/src/main/java/com/example/gestiondenotes/Formule_calcul_Note.java	(date 1584375194444)
+@@ -0,0 +1,48 @@
++package com.example.gestiondenotes;
++
++public class Formule_calcul_Note {
++    String Test_1 ;
++    String Test_2 ;
++    String abscence ;
++    String Participation ;
++
++    public Formule_calcul_Note(String test_1, String test_2, String abscence, String participation) {
++        Test_1 = test_1;
++        Test_2 = test_2;
++        this.abscence = abscence;
++        Participation = participation;
++    }
++
++    public String getAbscence() {
++        return abscence;
++    }
++
++    public String getParticipation() {
++        return Participation;
++    }
++
++    public String getTest_1() {
++        return Test_1;
++    }
++
++    public String getTest_2() {
++        return Test_2;
++    }
++
++    public void setAbscence(String abscence) {
++        this.abscence = abscence;
++    }
++
++    public void setParticipation(String participation) {
++        Participation = participation;
++    }
++
++    public void setTest_1(String test_1) {
++        Test_1 = test_1;
++    }
++
++    public void setTest_2(String test_2) {
++        Test_2 = test_2;
++    }
++
++}
+Index: app/src/main/res/drawable/groupe_icon.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/drawable/groupe_icon.xml	(date 1584292688540)
++++ app/src/main/res/drawable/groupe_icon.xml	(date 1584292688540)
+@@ -0,0 +1,9 @@
++<vector xmlns:android="http://schemas.android.com/apk/res/android"
++        android:width="35dp"
++        android:height="35dp"
++        android:viewportWidth="24.0"
++        android:viewportHeight="24.0">
++    <path
++        android:fillColor="#FF000000"
++        android:pathData="M16,11c1.66,0 2.99,-1.34 2.99,-3S17.66,5 16,5c-1.66,0 -3,1.34 -3,3s1.34,3 3,3zM8,11c1.66,0 2.99,-1.34 2.99,-3S9.66,5 8,5C6.34,5 5,6.34 5,8s1.34,3 3,3zM8,13c-2.33,0 -7,1.17 -7,3.5L1,19h14v-2.5c0,-2.33 -4.67,-3.5 -7,-3.5zM16,13c-0.29,0 -0.62,0.02 -0.97,0.05 1.16,0.84 1.97,1.97 1.97,3.45L17,19h6v-2.5c0,-2.33 -4.67,-3.5 -7,-3.5z"/>
++</vector>
+Index: app/src/main/java/com/example/gestiondenotes/Group_act.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/Group_act.java	(date 1584377582314)
++++ app/src/main/java/com/example/gestiondenotes/Group_act.java	(date 1584377582314)
+@@ -0,0 +1,109 @@
++package com.example.gestiondenotes;
++
++import androidx.annotation.NonNull;
++import androidx.appcompat.app.AlertDialog;
++import androidx.appcompat.app.AppCompatActivity;
++import androidx.constraintlayout.widget.Group;
++
++import android.content.DialogInterface;
++import android.os.Bundle;
++import android.view.View;
++import android.widget.EditText;
++import android.widget.ListView;
++
++import com.github.clans.fab.FloatingActionButton;
++import com.google.firebase.auth.FirebaseAuth;
++import com.google.firebase.database.DataSnapshot;
++import com.google.firebase.database.DatabaseError;
++import com.google.firebase.database.DatabaseReference;
++import com.google.firebase.database.FirebaseDatabase;
++import com.google.firebase.database.ValueEventListener;
++
++import java.util.ArrayList;
++
++public class Group_act extends AppCompatActivity {
++  static String id_module ;
++    FloatingActionButton btn ;
++    DatabaseReference mDatabase ;
++    String key ;
++    ListView listView ;
++    ArrayList<Groupes> groupes_users ;
++    @Override
++    protected void onCreate(Bundle savedInstanceState) {
++        super.onCreate(savedInstanceState);
++        setContentView(R.layout.activity_group_act);
++        id_module = getIntent().getExtras().getString("id");
++        listView = findViewById(R.id.list_view_groupes );
++
++        DatabaseReference db_ref = FirebaseDatabase.getInstance().
++                getReference().child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
++                child(id_module).child("Groupes");
++        db_ref.addValueEventListener(new ValueEventListener() {
++            @Override
++            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
++                groupes_users = new ArrayList<>();
++                for (DataSnapshot dataSnapshot1:dataSnapshot.getChildren()) {
++                    Groupes m = dataSnapshot1.getValue(Groupes.class);
++                    groupes_users.add(m);
++                }
++                groupesadapter adapter =new groupesadapter(Group_act.this,groupes_users);
++                listView.setAdapter(adapter);
++            }
++            @Override
++            public void onCancelled(@NonNull DatabaseError databaseError) {
++            }});
++        groupesadapter adapter= new groupesadapter(Group_act.this,groupes_users);
++        adapter.notifyDataSetChanged();
++        btn = findViewById(R.id.floating_action_button_add_groupe2);
++        mDatabase = FirebaseDatabase.getInstance().getReference();
++
++        btn.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                addGroupe();
++            }
++        });
++    }
++    void addGroupe() {
++        final AlertDialog.Builder dialog = new AlertDialog.Builder(Group_act.this);
++        dialog.setTitle("Ajouter un Groupe");
++       final View mview = getLayoutInflater().inflate(R.layout.dialog_add_groupe,null);
++        final EditText nom_edite = mview.findViewById(R.id.nom_groupe_dialog_bar);
++        final EditText niveau_edit = mview.findViewById(R.id.niveau_groupe_dialog_bar);
++        dialog.setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
++            @Override
++            public void onClick(DialogInterface dialog, int which) {
++               String nom =  nom_edite.getText().toString();
++               String niveau = niveau_edit.getText().toString();
++               if (nom.isEmpty()) {
++                   nom_edite.setError("Vous devez remplir ce champs");
++                   nom_edite.requestFocus();
++                   return;
++               }
++                if (niveau.isEmpty()) {
++                    nom_edite.setError("Vous devez remplir ce champs");
++                    nom_edite.requestFocus();
++                    return;
++                }
++                insertGroupe(nom,niveau);
++
++            }
++        });
++        dialog.setNegativeButton("Quitter", new DialogInterface.OnClickListener() {
++            @Override
++            public void onClick(DialogInterface dialog, int which) {
++             dialog.dismiss();
++            }
++        });
++        dialog.setView(mview);
++        AlertDialog d = dialog.create();
++        d.show();
++    }
++    void insertGroupe(String nom ,String niveau) {
++        Groupes g = new Groupes(nom,niveau);
++         key = mDatabase.child("Module_users").push().getKey();
++        g.setId(key);
++        mDatabase.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(id_module)
++                .child("Groupes").child(key).setValue(g);
++    }
++}
+Index: app/src/main/res/layout/dialog_add_groupe.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/dialog_add_groupe.xml	(date 1583862290000)
++++ app/src/main/res/layout/dialog_add_groupe.xml	(date 1584295893570)
+@@ -1,14 +1,21 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<RelativeLayout
+-    xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:layout_width="match_parent"
+-    android:layout_height="match_parent"
+-    android:padding="16dp">
+-
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:orientation="vertical" android:layout_width="match_parent"
++    android:layout_height="match_parent">
++    <EditText
++        android:padding="16dp"
++        android:background="@drawable/search_outline"
++        android:layout_marginTop="20dp"
++        android:hint="Nom du Groupe"
++        android:id="@+id/nom_groupe_dialog_bar"
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content" />
+     <EditText
+-        android:inputType="text"
+-        android:hint="Nom du Module"
++        android:padding="16dp"
++        android:background="@drawable/search_outline"
++        android:layout_marginTop="15dp"
++        android:id="@+id/niveau_groupe_dialog_bar"
++        android:hint="Entrer le niveau"
+         android:layout_width="match_parent"
+-        android:id="@+id/nom_du_groupe_dialog_bar"
+         android:layout_height="wrap_content" />
+-</RelativeLayout>
+\ No newline at end of file
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/java/com/example/gestiondenotes/Groupes.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/gestiondenotes/Groupes.java	(date 1584298551327)
++++ app/src/main/java/com/example/gestiondenotes/Groupes.java	(date 1584298551327)
+@@ -0,0 +1,36 @@
++package com.example.gestiondenotes;
++
++public class Groupes {
++    private String nom , niveau ;
++ String id ;
++
++    public String getId() {
++        return id;
++    }
++
++    public void setId(String id) {
++        this.id = id;
++    }
++
++
++    public String getNom() {
++        return nom;
++    }
++    public Groupes() {
++    }
++    public Groupes(String nom, String niveau) {
++        this.nom = nom;
++        this.niveau = niveau;
++    }
++
++    public String getNiveau() {
++        return niveau;
++    }
++
++    public void setNom(String nom) {
++        this.nom = nom;
++    }
++    public void setNiveau(String niveau) {
++        this.niveau = niveau;
++    }
++}
+Index: app/src/main/res/layout/activity_user.xml
+===================================================================
+--- app/src/main/res/layout/activity_user.xml	(date 1583862290000)
++++ app/src/main/res/layout/activity_group_act.xml	(date 1584377433651)
+@@ -1,9 +1,55 @@
+ <?xml version="1.0" encoding="utf-8"?>
+-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
++<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_width="match_parent"
++    android:padding="10dp"
+     android:layout_height="match_parent"
+-    tools:context=".User">
++    tools:context=".Group_act">
++    <ListView
++        android:divider="@null"
++        android:dividerHeight="0dip"
++        android:id="@+id/list_view_groupes"
++        android:layout_width="match_parent"
++        android:layout_height="match_parent" />
++    <com.github.clans.fab.FloatingActionMenu
++        android:id="@+id/floating_action_menu"
++        app:menu_openDirection="up"
++        app:menu_fab_label=""
++       app:menu_colorNormal="@color/colorAccent"
++        android:layout_width="wrap_content"
++        android:layout_alignParentBottom="true"
++        android:layout_alignParentEnd="true"
++        app:menu_backgroundColor="@android:color/transparent"
++        app:menu_showShadow="true"
++        app:menu_labels_colorNormal="@color/colorAccent"
++        app:menu_labels_textColor="@android:color/white"
++        android:layout_height="wrap_content" >
++        <com.github.clans.fab.FloatingActionButton
++            app:fab_size="mini"
++            app:fab_colorPressed="@color/colorPrimary"
++            android:src="@drawable/add_groupe_icon"
++            android:id="@+id/floating_action_button_add_groupe2"
++            app:fab_colorNormal="@color/colorAccent"
++            app:fab_label="Ajouter un groupe"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content" />
++        <com.github.clans.fab.FloatingActionButton
++            app:fab_size="mini"
++            android:src="@drawable/add_formule_icon"
++            android:id="@+id/item_ajouterformule"
++            app:fab_colorNormal="@color/colorAccent"
++            app:fab_label="Ajouter une formule"
++            android:layout_width="wrap_content"
++            android:layout_height="wrap_content" />
++
++    </com.github.clans.fab.FloatingActionMenu>
++
++
++
++
++
++
++
+ 
+-</androidx.constraintlayout.widget.ConstraintLayout>
+\ No newline at end of file
++</RelativeLayout>
+\ No newline at end of file
+Index: app/src/main/res/layout/dialog_add_module.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/layout/dialog_add_module.xml	(date 1584217377364)
++++ app/src/main/res/layout/dialog_add_module.xml	(date 1584217377364)
+@@ -0,0 +1,37 @@
++<?xml version="1.0" encoding="utf-8"?>
++<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:layout_width="350dp"
++    android:layout_height="wrap_content"
++    android:orientation="vertical"
++    xmlns:app="http://schemas.android.com/apk/res-auto"
++    android:padding="16dp">
++
++        <EditText
++            android:padding="15dp"
++            android:background="@drawable/search_outline"
++            android:inputType="text"
++            android:hint="Nom"
++            android:layout_width="match_parent"
++            android:id="@+id/nom_du_module_dialog_bar"
++            android:layout_height="50dp" />
++    <EditText
++        android:padding="15dp"
++        android:layout_marginTop="8dp"
++        android:background="@drawable/search_outline"
++        android:inputType="number"
++        android:hint="Coefficient"
++        android:layout_width="match_parent"
++        android:id="@+id/coefficient_du_module"
++        android:layout_height="50dp" />
++    <EditText
++        android:padding="15dp"
++        android:layout_marginTop="8dp"
++        android:background="@drawable/search_outline"
++        android:inputType="number"
++        android:hint="Note eliminatoire"
++        android:layout_width="match_parent"
++        android:id="@+id/note_eliminatoire_du_module"
++        android:layout_height="50dp" />
++
++
++</LinearLayout>
+\ No newline at end of file
+Index: app/src/main/res/values/styles.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/styles.xml	(date 1583862290000)
++++ app/src/main/res/values/styles.xml	(date 1584226390173)
+@@ -1,11 +1,12 @@
+ <resources>
+ 
+     <!-- Base application theme. -->
+-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
++    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+         <!-- Customize your theme here. -->
+-        <item name="colorPrimary">@color/colorPrimary</item>
++        <item name="colorPrimary">@color/colorAccent</item>
+         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+         <item name="colorAccent">@color/colorAccent</item>
+     </style>
+ 
++
+ </resources>
+Index: app/src/main/res/values/colors.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/res/values/colors.xml	(date 1583862290000)
++++ app/src/main/res/values/colors.xml	(date 1584381315674)
+@@ -1,6 +1,7 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <resources>
+-    <color name="colorPrimary">#18E1C8</color>
++    <color name="colorPrimary">#FFFFFF</color>
+     <color name="colorPrimaryDark">#21F387</color>
+     <color name="colorAccent">#2196F3</color>
++
+ </resources>
+diff --git app/src/main/res/drawable/round_search_black_18.png app/src/main/res/drawable/round_search_black_18.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..b51c528f9bbbc0cbd61ab93bf16c541632889938
+GIT binary patch
+literal 667
+zc$@*70%ZM(P)<h;3K|Lk000e1NJLTq002k;002k`1^@s6RqeA!0007FNkl<ZcmeI&
+z0fZs}6o>J{APhoSECwNj0AaC&MK~-D5DpL);jjn+79lJa;Sd&K5g>%aAwXD!MF=4*
+z!n+TUHS<W#^rm|sKLFeQO*2i+H}4#Ip67X<=Xo`>F~R~fO!vH^gBuj^UsT2rTgU;{
+zctRBySrtR<AV(VE8W&R+a$;L_kn2LcK~nUJ5V@;@1tbG=Tp>3V@eYCJ6BD#?iwYuC
+z(Le`N>>$w05W;)`CJ@C2-2?ui68iXrD8>k2x*kL^KH}|A#tfop!)!MYMHj~w;04;%
+zErQ9$kOYr7UHV94n5(9LuseAHw6|M1FGtTBMWj(#IdKnQrXnQ41JbOooQndO=uSC$
+z0;E|<`J7a@erX>fi>8nmzo2*K7kG~>>Of+=!9?3LUr8FuJ(`JDkQgDds0xX(go&1r
+z7+H0l*MSPiqDo!|ijYOO*3Ut6NQ@@3sBQNurr$U|Ba0@G7(JNiCnUxP(k@i)$L?UF
+z2$G<6re939D8NAaVZKc9g<fF;iSZkz`T<GMKf@Pvb(ku^BEz>@7m{EKlQkd-b|)O^
+zQTscn!E7UlqJP9WsfZCo@dVR_SU?oZ1COQv4_HGKe-XfZ6>K0HeBc>PL@4ZyT*f_y
+z+Av@AkeljQLC)k47}_6Tm}8vh-|I^lLQ*h50pTS))X>EH36GjO_PU%WKfYrIInWLh
+zG!fS-mm?`fXkmy2wvat*%<+O2O3<p99?3vHl8@vg`A9yJkK`lyNQwcJe55Uue54%$
+zB;+HF;q8qyhd?mJ6}&H15yA63&+|Ob^E}T={{T7~^d#ceuA~3}002ovPDHLkV1n!t
+B7MlP7
+
+diff --git app/src/main/res/drawable/rounded.png app/src/main/res/drawable/rounded.png
+new file mode 100644
+index 0000000000000000000000000000000000000000..f02e7d442b2eb5a940349552d4b93f3ab1fbb7dc
+GIT binary patch
+literal 69739
+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
+

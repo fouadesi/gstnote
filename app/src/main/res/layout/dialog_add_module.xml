@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp">
+
+        <EditText
+            android:padding="15dp"
+            android:background="@drawable/search_outline"
+            android:inputType="text"
+            android:hint="Nom"
+            android:layout_width="match_parent"
+            android:id="@+id/nom_du_module_dialog_bar"
+            android:layout_height="50dp" />
+    <EditText
+        android:padding="15dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/search_outline"
+        android:inputType="number"
+        android:hint="Coefficient"
+        android:layout_width="match_parent"
+        android:id="@+id/coefficient_du_module"
+        android:layout_height="50dp" />
+    <EditText
+        android:padding="15dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/search_outline"
+        android:inputType="number"
+        android:hint="Note eliminatoire"
+        android:layout_width="match_parent"
+        android:id="@+id/note_eliminatoire_du_module"
+        android:layout_height="50dp" />
+
+
+</LinearLayout>

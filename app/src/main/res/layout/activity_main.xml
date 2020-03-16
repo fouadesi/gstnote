@@ -2,13 +2,17 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+ android:background="@color/colorPrimary"
+    android:padding="10dp"
     android:layout_height="match_parent">
     <!-- Main content -->
-   <ListView
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-
-       android:id="@+id/listview" />
+    <ListView
+        android:divider="@null"
+        android:dividerHeight="0dip"
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floating_action_button_add_groupe"
@@ -17,8 +21,8 @@
         android:layout_margin="15dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-
         android:background="@color/colorAccent"
         app:srcCompat="@drawable/round_add_white_36dp" />
+
 
 </RelativeLayout>

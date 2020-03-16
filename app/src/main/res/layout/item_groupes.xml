@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:padding="10dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_marginTop="13dp"
+        android:id="@+id/nom_du_groupe_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/secular_one"
+        android:text="Nom :"
+        android:textColor="@android:color/black"
+        android:textSize="15sp" />
+    <TextView
+        android:fontFamily="@font/secular_one"
+        android:layout_below="@+id/nom_du_groupe_listview"
+        android:id="@+id/niveau_du_groupe_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Niveau :"
+        android:textColor="@color/colorAccent"
+        android:textSize="15sp" />
+    <ImageButton
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="10dp"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/delete_groupe_icon_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/delete_icon" />
+    <ImageButton
+        android:layout_marginTop="28dp"
+        android:layout_marginEnd="44dp"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/update_groupe_listview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_mode_edit_black_24dp" />
+    <ImageButton
+        android:layout_marginEnd="80dp"
+        android:layout_marginTop="28dp"
+        android:id="@+id/etudiant_listview"
+        android:layout_alignParentEnd="true"
+        android:layout_width="wrap_content"
+        android:background="@drawable/groupe_icon"
+        android:layout_height="wrap_content" />
+    <View
+        android:background="@color/colorAccent"
+        android:layout_marginTop="7dp"
+        android:layout_width="match_parent"
+        android:layout_below="@id/etudiant_listview"
+        android:layout_height="1dp" />
+</RelativeLayout>

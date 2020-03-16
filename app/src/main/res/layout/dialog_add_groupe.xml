@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
-
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <EditText
-        android:inputType="text"
-        android:hint="Nom du Module"
+        android:padding="16dp"
+        android:background="@drawable/search_outline"
+        android:layout_marginTop="20dp"
+        android:hint="Nom du Groupe"
+        android:id="@+id/nom_groupe_dialog_bar"
         android:layout_width="match_parent"
-        android:id="@+id/nom_du_groupe_dialog_bar"
         android:layout_height="wrap_content" />
-</RelativeLayout>
+    <EditText
+        android:padding="16dp"
+        android:background="@drawable/search_outline"
+        android:layout_marginTop="15dp"
+        android:id="@+id/niveau_groupe_dialog_bar"
+        android:hint="Entrer le niveau"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".Editgroupe">
+    <EditText
+        android:layout_marginTop="20dp"
+        android:padding="10dp"
+        android:background="@drawable/search_outline"
+        android:hint="Entrer le nom du groupe "
+        android:layout_width="match_parent"
+        android:id="@+id/nom_du_groupe_edit"
+        android:layout_height="wrap_content" />
+    <EditText
+        android:padding="10dp"
+        android:background="@drawable/search_outline"
+        android:layout_marginTop="10dp"
+        android:hint="Entrer le nom du groupe "
+        android:layout_width="match_parent"
+        android:id="@+id/niveau_du_groupe_edit"
+        android:layout_height="wrap_content" />
+    <Button
+        android:background="@drawable/search_outline"
+        android:id="@+id/edit_groupe"
+        android:layout_marginTop="20dp"
+        android:text="Edit Groupe"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content" />
+
+
+
+
+</LinearLayout>

@@ -2,16 +2,13 @@ package com.example.gestiondenotes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.app.ProgressDialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.example.gestiondenotes.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -59,34 +56,27 @@ public class SignUpActivity extends AppCompatActivity {
         if (name.isEmpty()) {
             ed_nom.setError("Vous devez remplir le champ");
             ed_nom.requestFocus();
-            return;
-        }
-
+            return; }
         if (email.isEmpty()) {
             ed_mail.setError("Vous devez remplir le champ");
             ed_nom.requestFocus();
-            return;
-        }
+            return; }
         if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             ed_mail.setError("Vous devez entrer un mail valid");
             ed_mail.requestFocus();
-            return;
-        }
+            return; }
         if (confpassword.isEmpty()) {
             ed_conf_password.setError("Vous devez remplir le champ");
             ed_conf_password.requestFocus();
-            return;
-        }
+            return; }
         if (password.length() < 6 ) {
             ed_password.setError("> 6");
             ed_password.requestFocus();
-            return;
-        }
+            return; }
         if (!password.equals(confpassword)) {
             ed_conf_password.setError("Les mot de passe doivent etre identique");
             ed_conf_password.requestFocus();
-            return;
-        }
+            return; }
         final  ProgressDialog pr = new ProgressDialog(SignUpActivity.this) ;
         pr.setMessage("Attendez s'il vous plait");
         pr.show();
