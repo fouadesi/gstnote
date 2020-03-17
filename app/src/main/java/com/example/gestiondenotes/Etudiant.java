@@ -41,19 +41,15 @@ public class Etudiant {
  public void setNote2(String note2) {
   this.note2 = note2;
  }
-
  public void setNom(String Nom) {
  this.Nom = Nom;
  }
-
  public void setID(String ID) {
   this.ID = ID;
  }
-
  public void setPrenom(String prenom) {
   Prenom = prenom;
  }
-
  public Etudiant(String nom, String prenom, String NI) {
   this.Nom = nom;
   Prenom = prenom;

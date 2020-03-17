@@ -7,7 +7,8 @@
     android:padding="10dp"
     android:layout_height="match_parent">
     <!-- Main content -->
-    <ListView
+            <ListView
+                android:layout_marginTop="?attr/actionBarSize"
         android:divider="@null"
         android:dividerHeight="0dip"
         android:id="@+id/listview"
@@ -19,10 +20,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
+        android:src="@drawable/add_dialog"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:background="@color/colorAccent"
-        app:srcCompat="@drawable/round_add_white_36dp" />
+        android:backgroundTint="@color/colorAccent" />
 
 
 </RelativeLayout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="350dp"
-    android:layout_height="400dp"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:padding="10dp">
@@ -11,18 +11,17 @@
        android:layout_marginStart="5dp"
        android:hint="nom"
 app:boxCornerRadiusBottomEnd="10dp"
-       app:counterEnabled="true"
+       app:counterEnabled="false"
        app:counterMaxLength="20"
        app:boxCornerRadiusBottomStart="10dp"
        app:boxCornerRadiusTopStart="10dp"
        app:boxCornerRadiusTopEnd="10dp"
        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
        app:boxBackgroundMode="outline"
-       android:layout_height="wrap_content">
-
-
+       android:layout_height="50dp">
        <com.google.android.material.textfield.TextInputEditText
            android:layout_width="match_parent"
+           android:padding="10dp"
            android:id="@+id/nom_du_module_dialog_bar"
            android:layout_height="wrap_content" />
    </com.google.android.material.textfield.TextInputLayout>
@@ -34,17 +33,14 @@ app:boxCornerRadiusBottomEnd="10dp"
         app:boxCornerRadiusTopEnd="10dp"
         android:layout_marginTop="3dp"
         android:layout_width="match_parent"
-
-
         android:layout_marginStart="5dp"
         android:hint=" Coefficient "
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         app:boxBackgroundMode="outline"
-        android:layout_height="wrap_content">
-
-
+        android:layout_height="50dp">
         <com.google.android.material.textfield.TextInputEditText
             android:inputType="number"
+            android:padding="10dp"
             android:layout_width="match_parent"
             android:id="@+id/coefficient_du_module"
             android:layout_height="wrap_content" />
@@ -56,19 +52,107 @@ app:boxCornerRadiusBottomEnd="10dp"
         app:boxCornerRadiusTopEnd="10dp"
         android:layout_width="match_parent"
         android:layout_marginTop="3dp"
-
         app:endIconMode="clear_text"
         android:layout_marginStart="5dp"
         android:hint="Note eliminatoire "
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         app:boxBackgroundMode="outline"
-        android:layout_height="wrap_content">
-
-
+        android:layout_height="50dp">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
+            android:padding="10dp"
+            android:inputType="number"
             android:id="@+id/note_eliminatoire_du_module"
         android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="3dp"
+        android:hint="Test 1"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:counterEnabled="false"
+        app:counterMaxLength="20"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundMode="outline"
+        android:layout_height="50dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:inputType="number"
+            android:padding="10dp"
+            android:id="@+id/test1_dialog_bar"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="3dp"
+        android:hint="Test 2"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:counterEnabled="false"
+        app:counterMaxLength="20"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundMode="outline"
+        android:layout_height="50dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:inputType="number"
+            android:id="@+id/test2_dialog_bar"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="3dp"
+        android:hint="Participation"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:counterEnabled="false"
+        app:counterMaxLength="20"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundMode="outline"
+        android:layout_height="50dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:inputType="number"
+            android:id="@+id/participation_dialog_bar"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_marginTop="3dp"
+        android:hint="abscence"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:counterEnabled="false"
+        app:counterMaxLength="20"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundMode="outline"
+        android:layout_height="50dp">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:padding="10dp"
+            android:inputType="number"
+            android:id="@+id/abscence_dialog_bar"
+            android:layout_height="match_parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
 

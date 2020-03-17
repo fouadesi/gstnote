@@ -1,21 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="350dp"
     android:layout_height="match_parent">
-    <EditText
-        android:padding="16dp"
-        android:background="@drawable/search_outline"
-        android:layout_marginTop="20dp"
-        android:hint="Nom du Groupe"
-        android:id="@+id/nom_groupe_dialog_bar"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:padding="16dp"
-        android:background="@drawable/search_outline"
-        android:layout_marginTop="15dp"
-        android:id="@+id/niveau_groupe_dialog_bar"
-        android:hint="Entrer le niveau"
+        android:layout_marginTop="3dp"
+        android:hint="nom"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:counterEnabled="false"
+        app:counterMaxLength="20"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundMode="outline"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:id="@+id/nom_groupe_dialog_bar"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        android:layout_marginTop="3dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_marginStart="15dp"
+        android:hint=" Niveau"
+        android:layout_marginEnd="15dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxBackgroundMode="outline"
+        android:layout_height="wrap_content">
+        <com.google.android.material.textfield.TextInputEditText
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:id="@+id/niveau_groupe_dialog_bar"
+            android:layout_height="wrap_content" />
+    </com.google.android.material.textfield.TextInputLayout>
+
 </LinearLayout>

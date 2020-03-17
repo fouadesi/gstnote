@@ -29,6 +29,7 @@ public class moduleadapter extends ArrayAdapter<Module_users> {
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_module, parent, false);
         }
+
         TextView nom, note_eli, coeff;
         ImageButton edit, delete,groupe;
         nom = (TextView) convertView.findViewById(R.id.nom_du_module_listview);
@@ -55,6 +56,10 @@ public class moduleadapter extends ArrayAdapter<Module_users> {
                 i.putExtra("coeff",module_users.getCoef());
                 i.putExtra("note eliminatoire",module_users.getNote_eliminatoire());
                 i.putExtra("id",module_users.getId());
+                i.putExtra("test1",module_users.formule.getTest1());
+                i.putExtra("test2",module_users.formule.getTest2());
+                i.putExtra("absence",module_users.formule.getAbscence());
+                i.putExtra("participation",module_users.formule.getParticipation());
                 getContext().startActivity(i); }});
         delete.setOnClickListener(new View.OnClickListener() {
             @Override

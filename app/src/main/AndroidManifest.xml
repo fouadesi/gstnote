@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.gestiondenotes">
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,13 +11,15 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".EtudiantAct"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" >
-        </activity>
-        <activity android:name=".Editgroupe"
+            android:theme="@style/AppTheme"></activity>
+        <activity
+            android:name=".Editgroupe"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name=".Group_act"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name=".EditModule"
+        <activity
+            android:name=".Group_act"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".EditModule"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".SignUpActivity"

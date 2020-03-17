@@ -6,6 +6,8 @@ public class Module_users {
   private String id ;
   private String  note_eliminatoire ;
   private String coef;
+   Formule formule ;
+
 
     public String getNote_eliminatoire() {
         return note_eliminatoire;
@@ -40,9 +42,13 @@ public class Module_users {
     public Module_users() {
     }
 
-    public Module_users(String nom, String note_eliminatoire, String coef) {
+    public Formule getFormule() {
+        return formule;
+    }
+
+    public Module_users(String nom, String note_eliminatoire, String coef, String test1, String test2, String participation, String absence ) {
         this.nom = nom;
         this.note_eliminatoire = note_eliminatoire;
         this.coef = coef;
-    }
+        this.formule = new Formule(test1,test2,participation,absence); }
 }
