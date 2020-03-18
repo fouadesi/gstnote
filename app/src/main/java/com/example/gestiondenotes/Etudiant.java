@@ -1,17 +1,43 @@
 package com.example.gestiondenotes;
 
 public class Etudiant {
- String Nom  ;
- String Prenom ;
- String NI ;
- String note1 ,note2 ;
- String ID ;
+ private String Nom  ;
+private String Prenom ;
+ private String NI ;
+ private String email ;
+ private String note1 ,note2 ;
+ private String ID ;
+ String PICTURE ;
+
+ public String getPICTURE() {
+  return PICTURE;
+ }
+
+ public void setPICTURE(String PICTURE) {
+  this.PICTURE = PICTURE;
+ }
+
  public String getNom() {
   return Nom;
  }
 
  public String getNI() {
   return NI;
+ }
+ public Etudiant(String Nom ,String prenom , String NI , String email, String PICTURE) {
+  this.Nom = Nom ;
+  this.Prenom = prenom ;
+  this.NI = NI ;
+  this.email = email ;
+  this.PICTURE = PICTURE; ;
+ }
+
+ public void setEmail(String email) {
+  this.email = email;
+ }
+
+ public String getEmail() {
+  return email;
  }
 
  public String getPrenom() {

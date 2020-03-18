@@ -61,6 +61,7 @@ public class Login extends AppCompatActivity {
             public void onClick(View v) {
                 Intent i = new Intent(Login.this, SignUpActivity.class);
                 startActivity(i);
+
             }
         });
     }
@@ -69,13 +70,12 @@ public class Login extends AppCompatActivity {
         progressDialog.setMessage("Attendez s'il vous plait");
         progressDialog.show();
         mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<AuthResult> task) {
+            @Override
+        public void onComplete(@NonNull Task<AuthResult> task) {
         progressDialog.dismiss();
         if (task.isSuccessful()) {
           Intent i = new Intent(Login.this, MainActivity.class);
           startActivity(i);
-         finish();
       } else {
             Toast.makeText(Login.this, task.getException().getMessage().toString(), Toast.LENGTH_SHORT).show();
         }

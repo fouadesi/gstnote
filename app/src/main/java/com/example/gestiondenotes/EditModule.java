@@ -1,15 +1,12 @@
 package com.example.gestiondenotes;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
@@ -18,14 +15,11 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 public class EditModule extends AppCompatActivity {
     DatabaseReference ref;
     EditText nom_module_edit_text, coef_du_module_edit_text, note_eliminatoire_du_module_edit_text,
             test1_edi, test2_edi, abscence_edi, participation_edi;
     String get_nom, get_coeff, get_note_elim, id, test1, test2, participation, abscence;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

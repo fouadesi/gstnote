@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(i);
             finish();
         }
-
         listView = findViewById(R.id.listview);
  /// Affichage des modules
         DatabaseReference db_ref = FirebaseDatabase.getInstance().
@@ -202,30 +201,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
               s.setAction("OK", new View.OnClickListener() {
                   @Override
                   public void onClick(View v) {
-                      s.dismiss();
-                  }
-              });
-         s.show();
+                      s.dismiss(); }});
+              s.show();
               } else {
                   Snackbar s =  Snackbar.make(findViewById(android.R.id.content),task.getException().getMessage(), Snackbar.LENGTH_LONG);
                   s.show();
               }
-            }
-        });
-
-        mDatabase.child("Module_users").child(mAuth.getCurrentUser().getUid()).child(key).setValue(module_users);
-
-
-    }
-
+            }}); }
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         return false;
     }
-
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
-
     }
 }
 

@@ -34,18 +34,18 @@ public class Group_act extends AppCompatActivity {
     FloatingActionButton btn;
     DatabaseReference mDatabase;
     FloatingActionButton add_formule;
-    String key;
+   static String key;
     ListView listView;
     ArrayList<Groupes> groupes_users;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_group_act);
-        id_module = getIntent().getExtras().getString("id");
-        listView = findViewById(R.id.list_view_groupes);
-        add_formule = findViewById(R.id.item_ajouterformule);
-        add_formule.setOnClickListener(new View.OnClickListener() {
+         super.onCreate(savedInstanceState);
+         setContentView(R.layout.activity_group_act);
+         id_module   =  getIntent().getExtras().getString("id");
+         listView    =  findViewById(R.id.list_view_groupes);
+         add_formule = findViewById(R.id.item_ajouterformule);
+         add_formule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Ajouter_formule();
