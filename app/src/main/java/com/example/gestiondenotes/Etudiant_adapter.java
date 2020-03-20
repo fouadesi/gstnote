@@ -69,16 +69,25 @@ public class Etudiant_adapter extends ArrayAdapter<Etudiant> {
         });
         return convertView;
     }
-    void Supprimer_etudiant(Etudiant etudiant) {
+    void Supprimer_etudiant(final Etudiant etudiant) {
         MaterialAlertDialogBuilder m  = new MaterialAlertDialogBuilder(getContext()) ;
         m.setTitle("Attention");
         m.setMessage("Vous voulez Supprimece etudiant");
+        m.show();
         m.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 DatabaseReference db_ref = FirebaseDatabase.getInstance().getReference();
-                db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser()
-                        .getUid()).child(Group_act.key);
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
+                        child(Group_act.id_module).child("Groupes").child(EtudiantAct.key_g).
+                        child("Etudiants").child(etudiant.getNI()).removeValue();
+
+            }
+        });
+        m.setNegativeButton("Non", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
             }
         });
     }

@@ -6,7 +6,7 @@ public class Module_users {
   private String id ;
   private String  note_eliminatoire ;
   private String coef;
-   Formule formule ;
+  Formule formule ;
 
 
     public String getNote_eliminatoire() {
