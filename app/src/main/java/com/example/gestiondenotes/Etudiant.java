@@ -2,21 +2,21 @@ package com.example.gestiondenotes;
 
 public class Etudiant {
  private String Nom  ;
-private String Prenom ;
+ private String Prenom ;
  private String NI ;
+ private String Abscence ;
  private String email ;
  private String note1 ,note2 ;
  private String ID ;
- String PICTURE ;
+ String picture ;
 
- public String getPICTURE() {
-  return PICTURE;
+ public String getAbscence() {
+  return Abscence;
  }
 
- public void setPICTURE(String PICTURE) {
-  this.PICTURE = PICTURE;
+ public void setAbscence(String abscence) {
+  Abscence = abscence;
  }
-
  public String getNom() {
   return Nom;
  }
@@ -24,14 +24,22 @@ private String Prenom ;
  public String getNI() {
   return NI;
  }
- public Etudiant(String Nom ,String prenom , String NI , String email, String PICTURE) {
+
+ public String getPicture() {
+  return picture;
+ }
+
+ public void setPicture(String picture) {
+  this.picture = picture;
+ }
+
+ public Etudiant(String Nom , String prenom , String NI , String email, String PICTURE) {
   this.Nom = Nom ;
   this.Prenom = prenom ;
   this.NI = NI ;
   this.email = email ;
-  this.PICTURE = PICTURE; ;
+  this.picture = PICTURE; ;
  }
-
  public void setEmail(String email) {
   this.email = email;
  }
@@ -43,27 +51,21 @@ private String Prenom ;
  public String getPrenom() {
   return Prenom;
  }
-
  public String getID() {
   return ID;
  }
-
  public String getNote1() {
   return note1;
  }
-
  public String getNote2() {
   return note2;
  }
-
  public void setNI(String NI) {
   this.NI = NI;
  }
-
  public void setNote1(String note1) {
   this.note1 = note1;
  }
-
  public void setNote2(String note2) {
   this.note2 = note2;
  }

@@ -47,7 +47,7 @@ public class EtudiantAct extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         ViewPagerAdapter viewpageradapter = new ViewPagerAdapter(getSupportFragmentManager(),0) ;
         viewpageradapter.Addfragment(fragmentActivity1,"Ajouter un etudiant");
-        viewpageradapter.Addfragment(fragmentActivity2,"Remplir les notes");
+        viewpageradapter.Addfragment(fragmentActivity2,"Liste des etudiants");
         viewpageradapter.Addfragment(fragmentActivity3,"ajouter un etudiant");
        viewPager.setAdapter(viewpageradapter);
     }

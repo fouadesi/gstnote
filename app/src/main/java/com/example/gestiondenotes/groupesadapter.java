@@ -35,7 +35,7 @@ public class groupesadapter extends ArrayAdapter<Groupes> {
         nom = (TextView) convertView.findViewById(R.id.nom_du_groupe_listview);
         niveau = (TextView) convertView.findViewById(R.id.niveau_du_groupe_listview);
         nom.setText("Nom : " + groupe_users.getNom());
-        niveau.setText("Note Eliminatoire : " + groupe_users.getNiveau());
+        niveau.setText("Niveau : " + groupe_users.getNiveau());
         edit = convertView.findViewById(R.id.update_groupe_listview);
         edit.setOnClickListener(new View.OnClickListener() {
             @Override

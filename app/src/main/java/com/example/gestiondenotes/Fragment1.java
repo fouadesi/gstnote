@@ -19,6 +19,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -63,6 +65,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.io.IOException;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -133,20 +136,21 @@ public class Fragment1 extends Fragment {
        Uri img_uri ;
     private ProgressDialog progressDialog;
     private ImageButton img_button ;
+    String img_uri_download ;
+    String PHOTO_DEFAULT = "https://firebasestorage.googleapis.com/" +
+            "v0/b/gestion-des-notes-57987.appspot.com/o/IMAGES_ETUDIANT%2Fe.j" +
+            "pg?alt=media&token=0d25d198-f42d-42b7-8b59-1c61fa95ef8d" ;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         // Inflate the layout for this fragment
-
         View v =  inflater.inflate(R.layout.fragment_1, container, false);
         final TextInputEditText txt_nom = v.findViewById(R.id.nom_du_etudiant_fragment1);
         final TextInputEditText txt_prenom = v.findViewById(R.id.prenom_du_etudiant_fragment1);
         final TextInputEditText txt_email = v.findViewById(R.id.email_du_etudiant_email_fragment);
         final TextInputEditText txt_ID = v.findViewById(R.id.numero_du_etudiant_fragment1);
         imageView = v.findViewById(R.id.image);
-        img_uri = Uri.parse("android.resource://com.example.gestiondenotes/drawable/e.jpg");
         progressDialog = new ProgressDialog(getContext());
         storageReference = FirebaseStorage.getInstance().getReference();
         Button btn = v.findViewById(R.id.Button_ajouter_un_eleve);
@@ -156,7 +160,7 @@ public class Fragment1 extends Fragment {
                final String nom = txt_nom.getText().toString() ;
                final String prenom = txt_prenom.getText().toString();
                final String  mail = txt_email.getText().toString();
-               final String NI = txt_ID.getText().toString() ;
+               final  String NI = txt_ID.getText().toString() ;
                String ERROR = "Vous devez remplir ce champ" ;
                if (nom.isEmpty()) {
                    txt_nom.setError(ERROR);
@@ -174,17 +178,49 @@ public class Fragment1 extends Fragment {
                if (!Patterns.EMAIL_ADDRESS.matcher(mail).matches()) {
                    txt_email.setError("Enter a valid mail");
                    return; }
-               StorageReference st = storageReference.child("IMAGES_ETUDIANT").child("img_"+ NI);
-               st.putFile(img_uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                   @Override
-                   public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                     String PICTURE = taskSnapshot.getUploadSessionUri().toString();
-                     DatabaseReference db_ref  = FirebaseDatabase.getInstance().getReference();
-                     Etudiant e = new Etudiant(nom,prenom,NI,mail,PICTURE);
-                       db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
-                               child(Group_act.id_module).child("Groupes").child(EtudiantAct.key_g).setValue(e);
-                   }
-               });
+              if (img_uri == null) {
+                  Toast.makeText(getContext(),"Vous devez Ajouter une photo ",Toast.LENGTH_SHORT).show();
+                    Etudiant e  = new Etudiant(nom,prenom,NI,mail,PHOTO_DEFAULT );
+                    saveEtudiant(e);
+                  return;
+              }
+             final  StorageReference st = storageReference.child("IMAGES_ETUDIANT").child("img_"+ NI);
+             final UploadTask uploadTask =   st.putFile(img_uri);
+             uploadTask.addOnFailureListener(new OnFailureListener() {
+                 @Override
+                 public void onFailure(@NonNull Exception e) {
+                      Toast.makeText(getContext(), e.getMessage().toString(),Toast.LENGTH_LONG).show();
+                 }
+             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                 @Override
+                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                     Toast.makeText(getContext(),"Image uploaded succefully",Toast.LENGTH_LONG).show();
+                     Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                         @Override
+                         public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                             if (!task.isSuccessful()) {
+                              throw  task.getException() ;
+                             }
+                             img_uri_download = st.getDownloadUrl().toString();
+                             return st.getDownloadUrl();
+                         }
+                     }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                         @Override
+                         public void onComplete(@NonNull Task<Uri> task) {
+                            if (task.isSuccessful()) {
+                                img_uri_download = task.getResult().toString();
+                       Toast.makeText(getContext(), "getting image url correctly", Toast.LENGTH_LONG).show();
+                       Etudiant e = new Etudiant(nom,prenom,NI,mail,img_uri_download);
+                       saveEtudiant(e);
+                            } else {
+
+                            }
+                         }
+                     });
+                 }
+             });
+
+
 
             }
         });
@@ -197,11 +233,18 @@ public class Fragment1 extends Fragment {
      startActivityForResult(gallery,200);
             }
         });
-
-
       return v ;
     }
-
+    void saveEtudiant(Etudiant e) {
+        e.setAbscence("0");
+        e.setNote1("0");
+        e.setNote2("0");
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
+                child(Group_act.id_module).child("Groupes").child(EtudiantAct.key_g).
+                child("Etudiants").child(e.getNI()).setValue(e);
+    }
+    void CheckIfNiexists() {}
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         // on teste si le resulta de notre demande et validee et data != null
