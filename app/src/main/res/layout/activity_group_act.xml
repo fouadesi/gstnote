@@ -6,7 +6,72 @@
     android:padding="10dp"
     android:layout_height="match_parent"
     tools:context=".Group_act">
+    <TextView
+        android:id="@+id/title"
+android:layout_marginTop="20dp"        android:fontFamily="@font/secular_one"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        android:text="La formule de calcule : "
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_below="@+id/title"
+        android:padding="10dp"
+        android:id="@+id/formule_groupeAct"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+            <TextView
+                android:id="@+id/test1_list"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/secular_one"
+                android:textSize="16sp"
+                android:text="TEST1 :"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/test2_list"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/secular_one"
+                android:textSize="16sp"
+                android:text="TEST2 :"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/absence_list"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/secular_one"
+                android:textSize="16sp"
+                android:text="ABSENCE :"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/participation_list"
+                android:textColor="@android:color/black"
+                android:fontFamily="@font/secular_one"
+                android:textSize="16sp"
+                android:text="PARTICIPATION :"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+    <TextView
+        android:layout_below="@+id/formule_groupeAct"
+        android:id="@+id/title_groupe"
+        android:fontFamily="@font/secular_one"
+        android:textColor="@color/colorAccent"
+        android:textSize="18sp"
+        android:text="Liste des groupes :"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
     <ListView
+        android:layout_marginTop="3dp"
+        android:layout_below="@+id/title_groupe"
         android:divider="@null"
         android:dividerHeight="0dip"
         android:id="@+id/list_view_groupes"
@@ -39,7 +104,7 @@
             android:src="@drawable/add_formule_icon"
             android:id="@+id/item_ajouterformule"
             app:fab_colorNormal="@color/colorAccent"
-            app:fab_label="Ajouter une formule"
+            app:fab_label="Modifier la formule"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

@@ -10,6 +10,18 @@ public class Etudiant {
  private String ID ;
  String picture ;
 
+ public Etudiant(String nom, String prenom, String NI, String abscence, String email, String note1, String note2,  String picture) {
+  Nom = nom;
+  Prenom = prenom;
+  this.NI = NI;
+  Abscence = abscence;
+  this.email = email;
+  this.note1 = note1;
+  this.note2 = note2;
+  this.ID = ID;
+  this.picture = picture;
+ }
+
  public String getAbscence() {
   return Abscence;
  }
@@ -85,4 +97,5 @@ public class Etudiant {
  }
  public Etudiant() {
  }
+
 }

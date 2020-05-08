@@ -1,7 +1,6 @@
 package com.example.gestiondenotes;
 
 public class Formule {
-    String id = "000" ;
     String Test1 ;
     String Test2 ;
     String Participation ;
@@ -15,9 +14,7 @@ public class Formule {
         return abscence;
     }
 
-    public String getId() {
-        return id;
-    }
+
 
     public String getTest1() {
         return Test1;
@@ -33,10 +30,6 @@ public class Formule {
 
     public void setAbscence(String abscence) {
         this.abscence = abscence;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
     public void setTest1(String test1) {
         Test1 = test1;

@@ -32,6 +32,7 @@ public class SignUpActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent (SignUpActivity.this,Login.class));
+                finish();
             }
         });
         ed_mail = findViewById(R.id.email_signUp);

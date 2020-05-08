@@ -6,13 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".EtudiantAct">
     <com.google.android.material.appbar.AppBarLayout
-
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
     <androidx.appcompat.widget.Toolbar
         android:layout_width="match_parent"
         android:id="@+id/toolbar"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="10dp"
         android:background="@android:color/white" />
         <com.google.android.material.tabs.TabLayout
             app:tabMode="scrollable"

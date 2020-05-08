@@ -6,7 +6,12 @@ public class Module_users {
   private String id ;
   private String  note_eliminatoire ;
   private String coef;
-  Formule formule ;
+
+  Formule formule = new Formule("","","","");
+
+    public void setFormule(Formule formule) {
+        this.formule = formule;
+    }
 
 
     public String getNote_eliminatoire() {
@@ -22,6 +27,7 @@ public class Module_users {
     public String getNom() {
         return nom;
     }
+
 
     public void setCoef(String coef) {
         this.coef = coef;
@@ -46,9 +52,25 @@ public class Module_users {
         return formule;
     }
 
+    public Module_users(String nom, String note_eliminatoire, String coef) {
+        this.nom = nom;
+        this.note_eliminatoire = note_eliminatoire;
+        this.coef = coef;
+    }
+
     public Module_users(String nom, String note_eliminatoire, String coef, String test1, String test2, String participation, String absence ) {
         this.nom = nom;
         this.note_eliminatoire = note_eliminatoire;
         this.coef = coef;
-        this.formule = new Formule(test1,test2,participation,absence); }
+        this.formule = new Formule(test1,test2,participation,absence);
+
+    }
+
+
+    public Module_users(String nom, String id, String note_eliminatoire, String coef) {
+        this.nom = nom;
+        this.id = id;
+        this.note_eliminatoire = note_eliminatoire;
+        this.coef = coef;
+    }
 }

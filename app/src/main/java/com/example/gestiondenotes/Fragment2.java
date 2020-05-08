@@ -23,6 +23,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,8 +72,7 @@ public class Fragment2 extends Fragment {
         }
     }
     ListView mResultList;
-    EditText mSearch_Field ;
-    ImageButton mSearch_btn;
+
     View v  ;
     DatabaseReference db_ref ;
     ArrayList<Etudiant> etudiant_users ;

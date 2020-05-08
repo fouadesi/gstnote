@@ -1,16 +1,13 @@
 package com.example.gestiondenotes;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,7 +17,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,26 +31,164 @@ public class Group_act extends AppCompatActivity {
     DatabaseReference mDatabase;
     FloatingActionButton add_formule;
    static String key;
-    ListView listView;
+    ListView listView,listView2;
     ArrayList<Groupes> groupes_users;
+    ArrayList<Formule> formules ;
+    TextView formule_teste1,formule_teste2 ,formule_participation,formule_absence ;
+    static String _test1 ;
+   static  String _test2 ;
+  static   String _participation ;
+  static  String _absence;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_group_act);
+         formule_absence = findViewById(R.id.absence_list);
+         formule_teste1 = findViewById(R.id.test1_list) ;
+         formule_teste2 = findViewById(R.id.test2_list);
+         formule_participation = findViewById(R.id.participation_list);
+        _test1 = getIntent().getExtras().getString("test1");
+        _test2 = getIntent().getExtras().getString("test2");
+        _participation = getIntent().getExtras().getString("participation");
+        _absence = getIntent().getExtras().getString("absence");
+
+
+     final   String test1 = getIntent().getExtras().getString("test1");
+      final  String test2 = getIntent().getExtras().getString("test2");
+      final  String participation = getIntent().getExtras().getString("participation");
+       final String absence = getIntent().getExtras().getString("absence");
+
+        formule_teste1.setText("TEST1 : " + test1 + " %");
+        formule_teste2.setText("TEST2 : " + test2 + " %");
+        formule_absence.setText("ABSENCE : " + absence + " %");
+        formule_participation.setText("PARTICIPATION : " + participation + " %");
+
+
          id_module   =  getIntent().getExtras().getString("id");
          listView    =  findViewById(R.id.list_view_groupes);
          add_formule = findViewById(R.id.item_ajouterformule);
+
          add_formule.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Ajouter_formule();
-            }
-        });
-        DatabaseReference db_ref = FirebaseDatabase.getInstance().
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(Group_act.this);
+                builder.setTitle("Ajouter une Formule");
+                builder.setIcon(R.drawable.groupe_blackicon);
+                builder.setBackground(getResources().getDrawable(R.drawable.design_alert_dialog));
+                final View mview = getLayoutInflater().inflate(R.layout.add_formule, null);
+                final TextInputEditText Test1 = mview.findViewById(R.id.formule_test1);
+                final TextInputEditText Test2 = mview.findViewById(R.id.formule_test2);
+                final TextInputEditText Absence = mview.findViewById(R.id.formule_absence);
+                final TextInputEditText Participation = mview.findViewById(R.id.formule_participation);
+                Test1.setText(test1);
+                Test2.setText(test2);
+                Absence.setText(absence);
+                Participation.setText(participation);
+                builder.setView(mview);
+                builder.setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        final String Test1_edi = Test1.getText().toString().trim();
+                        final String Test2_edi = Test2.getText().toString().trim();
+                        final String Absence_edi = Absence.getText().toString().trim();
+                        String Participation_edi = Participation.getText().toString();
+
+                        if (Test1_edi.isEmpty() || Test2_edi.isEmpty() || Absence_edi.isEmpty() || Participation_edi.isEmpty()) {
+                            final Snackbar s = Snackbar.make(findViewById(android.R.id.content),
+                                    "Vous devez remplir les champs", Snackbar.LENGTH_LONG);
+                            s.setDuration(10000);
+                            s.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
+                            s.setBackgroundTint(getResources().getColor(R.color.colorAccent));
+                            s.setTextColor(getResources().getColor(R.color.colorPrimary));
+                            s.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+                            s.setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    s.dismiss();
+                                }
+                            });
+                            s.show();
+                            return;
+
+                        }
+                        if (Double.valueOf(Test1_edi) + Double.valueOf(Test2_edi) != 100) {
+                            final Snackbar s = Snackbar.make(findViewById(android.R.id.content),
+                                    "La somme Entre le test1 et le test2 != 100 % ", Snackbar.LENGTH_LONG);
+                            s.setDuration(10000);
+                            s.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
+                            s.setBackgroundTint(getResources().getColor(R.color.colorAccent));
+                            s.setTextColor(getResources().getColor(R.color.colorPrimary));
+                            s.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+                            s.setAction("OK", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    s.dismiss();
+                                }
+                            });
+                            s.show();
+                            return;
+                        }
+                        final Formule f = new Formule(Test1_edi,Test2_edi,Absence_edi,Participation_edi) ;
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+                        mDatabase = FirebaseDatabase.getInstance().getReference() ;
+                        mDatabase.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
+                                child(id_module)
+                                .child("formule").setValue(f).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                             if (task.isSuccessful()) {
+                                 _test1= Test1_edi ;
+                                 _test2 = Test2_edi ;
+                                 _absence = Absence_edi ;
+                                 formule_teste1.setText("TEST1 : " + f.getTest1()+ " %");
+                                 formule_teste2.setText("TEST2 : " + f.getTest2()+ " %");
+                                 formule_absence.setText("ABSENCE : " + " - " +f.getAbscence()+ " / abs");
+                                 formule_participation.setText("PARTICIPATION : " + "+ " + f.getParticipation() +" / Par");
+                                 final Snackbar s = Snackbar.make(findViewById(android.R.id.content),
+                                         "Bien inserer", Snackbar.LENGTH_LONG);
+                                 s.setDuration(10000);
+                                 s.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
+                                 s.setBackgroundTint(getResources().getColor(R.color.colorAccent));
+                                 s.setTextColor(getResources().getColor(R.color.colorPrimary));
+                                 s.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+                                 s.setAction("OK", new View.OnClickListener() {
+                                     @Override
+                                     public void onClick(View v) {
+                                         s.dismiss();
+                                     }
+                                 });
+                                 s.show();
+                             }  else {
+                                 final Snackbar s = Snackbar.make(findViewById(android.R.id.content),
+                                         task.getException().getMessage().toString(), Snackbar.LENGTH_LONG);
+                                 s.setDuration(10000);
+                                 s.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
+                                 s.setBackgroundTint(getResources().getColor(R.color.colorAccent));
+                                 s.setTextColor(getResources().getColor(R.color.colorPrimary));
+                                 s.setActionTextColor(getResources().getColor(R.color.colorPrimary));
+                                 s.setAction("OK", new View.OnClickListener() {
+                                     @Override
+                                     public void onClick(View v) {
+                                         s.dismiss();
+                                     }
+                                 });
+                             }
+                            }
+                        });
+                     }
+                });
+                builder.show();
+            }});
+
+
+
+
+        DatabaseReference db_ref2 = FirebaseDatabase.getInstance().
                 getReference().child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
                 child(id_module).child("Groupes");
-        db_ref.addValueEventListener(new ValueEventListener() {
+        db_ref2.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 groupes_users = new ArrayList<>();
@@ -131,7 +265,8 @@ public class Group_act extends AppCompatActivity {
         key = mDatabase.child("Module_users").push().getKey();
         g.setId(key);
         mDatabase.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(id_module)
-                .child("Groupes").child(key).setValue(g).addOnCompleteListener(new OnCompleteListener<Void>() {
+                .child("Groupes").child(key).
+                setValue(g).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
@@ -145,55 +280,28 @@ public class Group_act extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             s.dismiss();
-                        }
-                    });
+                        }});
                     s.show();
                 } else {
-                    Snackbar s = Snackbar.make(findViewById(android.R.id.content), task.getException().getMessage(), Snackbar.LENGTH_LONG);
+                    final Snackbar s = Snackbar.make(findViewById(android.R.id.content),
+                            task.getException().getMessage(), Snackbar.LENGTH_LONG);
+                    s.setDuration(10000);
+                    s.setActionTextColor(getResources().getColor(R.color.colorAccent));
+                    s.setAnimationMode(BaseTransientBottomBar.ANIMATION_MODE_SLIDE);
+                    s.setBackgroundTint(getResources().getColor(R.color.colorAccent));
+                    s.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    s.setAction("OK", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            s.dismiss();
+
+                        }});
                     s.show();
                 }
             }
         });
     }
 
-    void Ajouter_formule() {
-        DatabaseReference db_ref;
-        db_ref = FirebaseDatabase.getInstance().getReference();
-        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(Group_act.this);
-        builder.setBackground(getResources().getDrawable(R.drawable.design_alert_dialog));
-        builder.setIcon(getResources().getDrawable(R.drawable.add_formule_icon));
-        View mView = getLayoutInflater().inflate(R.layout.item_module, null);
-        final TextInputEditText Test1_for = mView.findViewById(R.id.test1_dialog_bar);
-        TextInputEditText Test2_for = mView.findViewById(R.id.test2_dialog_bar);
-        TextInputEditText Participation_for = mView.findViewById(R.id.participation_dialog_bar);
-         TextInputEditText abscence_for = findViewById(R.id.abscence_dialog_bar);
-        final Formule f = new Formule("","","","");
-        db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child(id_module).child("000").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        f.setTest1(dataSnapshot.getValue(Formule.class).getTest1());
 
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        Test1_for.setText("f.getTest1()");
-        Test2_for.setText(f.getTest2());
-        abscence_for.setText(f.getAbscence());
-        Participation_for.setText(f.getParticipation());
-        builder.setView(mView);
-
-        builder.setPositiveButton("Ajouter", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-
-    }
 }
 

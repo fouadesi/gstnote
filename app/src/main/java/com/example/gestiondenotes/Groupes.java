@@ -2,17 +2,13 @@ package com.example.gestiondenotes;
 
 public class Groupes {
     private String nom , niveau ;
- String id ;
-
+    String id ;
     public String getId() {
         return id;
     }
-
     public void setId(String id) {
         this.id = id;
     }
-
-
     public String getNom() {
         return nom;
     }

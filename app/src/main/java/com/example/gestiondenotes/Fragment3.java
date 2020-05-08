@@ -2,11 +2,22 @@ package com.example.gestiondenotes;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 
 /**
@@ -54,11 +65,36 @@ public class Fragment3 extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+    ListView mResultList ;
+    ArrayList<Etudiant> etudiant_users ;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_3, container, false);
+        View v  ;
+        v = inflater.inflate(R.layout.fragment_3, container, false);
+        mResultList = v.findViewById(R.id.listView_fra3);
+        DatabaseReference db_ref = FirebaseDatabase.getInstance().
+                getReference().child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).
+                child(Group_act.id_module).child("Groupes").child(EtudiantAct.key_g).child("Etudiants");
+        db_ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                etudiant_users = new ArrayList<>();
+                for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                    Etudiant m = dataSnapshot1.getValue(Etudiant.class);
+                    etudiant_users.add(m);
+                }
+                absence_adapter adapter = new absence_adapter(getContext(), etudiant_users);
+                mResultList.setAdapter(adapter);
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+            }
+        });
+        absence_adapter adapter = new absence_adapter(getContext(), etudiant_users);
+        adapter.notifyDataSetChanged();
+        return  v;
     }
 }

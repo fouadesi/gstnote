@@ -8,7 +8,7 @@
     android:layout_height="match_parent">
     <!-- Main content -->
             <ListView
-                android:layout_marginTop="?attr/actionBarSize"
+                android:layout_marginTop="20dp"
         android:divider="@null"
         android:dividerHeight="0dip"
         android:id="@+id/listview"

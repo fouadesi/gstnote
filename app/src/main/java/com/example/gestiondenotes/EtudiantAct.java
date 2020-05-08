@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.transition.Explode;
 import android.view.View;
@@ -16,6 +17,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -37,7 +39,6 @@ public class EtudiantAct extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_etudiant);
         toolbar = findViewById(R.id.toolbar) ;
-        setSupportActionBar(toolbar);
         viewPager = findViewById(R.id.view_pager) ;
         tabLayout = findViewById(R.id.tab_layout);
         key_g = getIntent().getExtras().getString("ID");
@@ -46,22 +47,20 @@ public class EtudiantAct extends AppCompatActivity {
         fragmentActivity3 = new Fragment3() ;
         tabLayout.setupWithViewPager(viewPager);
         ViewPagerAdapter viewpageradapter = new ViewPagerAdapter(getSupportFragmentManager(),0) ;
-        viewpageradapter.Addfragment(fragmentActivity1,"Ajouter un etudiant");
         viewpageradapter.Addfragment(fragmentActivity2,"Liste des etudiants");
-        viewpageradapter.Addfragment(fragmentActivity3,"ajouter un etudiant");
-       viewPager.setAdapter(viewpageradapter);
+        viewpageradapter.Addfragment(fragmentActivity1,"Ajouter un etudiant");
+        viewpageradapter.Addfragment(fragmentActivity3,"Marquer les Absence");
+
+        viewPager.setAdapter(viewpageradapter);
     }
+
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
         private List<Fragment> fragment = new ArrayList<>();
         private List<String> FragmentTitle = new ArrayList<>();
-
-
-
         public ViewPagerAdapter(@NonNull FragmentManager fm) {
             super(fm);
         }
-
         public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
             super(fm, behavior);
         }

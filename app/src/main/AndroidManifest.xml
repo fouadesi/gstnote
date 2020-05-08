@@ -1,38 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.gestiondenotes">
-    <uses-permission android:name="android.permission.INTERNET"/>
 
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="Bienvenue"
+        android:label="Gestion des notes de TD"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Ajouter_Etudiant_man"></activity>
+        <activity android:name=".profil_etudiant"></activity>
+        <activity android:name=".Ajouter_Etudiant_man" />
         <activity
+            android:label="Les etudiants"
             android:name=".EtudiantAct"
             android:theme="@style/AppTheme" />
         <activity
+            android:label="Modifier le groupe"
             android:name=".Editgroupe"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/AppTheme" />
         <activity
+            android:label="La Liste des Groupes"
             android:name=".Group_act"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".EditModule"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".SignUpActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".Login"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:theme="@style/AppTheme"
+            android:label="Les modules"
+            android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

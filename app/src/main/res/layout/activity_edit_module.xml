@@ -7,86 +7,88 @@
     android:padding="10dp"
     android:layout_height="wrap_content"
     tools:context=".EditModule">
-        <EditText
+        <TextView
+
+            android:id="@+id/title"
+            android:layout_marginTop="110dp"
+            android:fontFamily="@font/secular_one"
+            android:textColor="@color/colorAccent"
+            android:textSize="20sp"
+            android:text="Modifier le Module :"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:hint="Nom"
-            android:background="@drawable/search_outline"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:counterEnabled="false"
+            app:counterMaxLength="20"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxBackgroundMode="outline"
+            android:layout_height="50dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:id="@+id/nom_du_module_edit"
+                    android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:padding="10dp"
-            android:id="@+id/nom_du_module_edit"
-            android:layout_height="wrap_content" />
-
-
-        <EditText
-            android:background="@drawable/search_outline"
-            android:layout_marginTop="5dp"
-        android:hint="Coefficient "
-            android:inputType="number"
-            android:padding="10dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
+            android:hint="Coefficient"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:counterEnabled="false"
+            app:counterMaxLength="20"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxBackgroundMode="outline"
+            android:layout_height="50dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:padding="10dp"
+                    android:id="@+id/coefficient_edit"
+                    android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:id="@+id/coefficient_edit"
-            android:layout_height="wrap_content" />
-
-        <EditText
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:hint="Note eliminatoire"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/search_outline"
-            android:layout_width="match_parent"
-            android:padding="10dp"
-            android:inputType="number"
-            android:id="@+id/note_eliminatoire_edit"
-            android:layout_height="wrap_content" />
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:counterEnabled="false"
+            app:counterMaxLength="20"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            app:boxBackgroundMode="outline"
+            android:layout_height="50dp">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:inputType="textEmailAddress"
+                    android:padding="10dp"
+                    android:id="@+id/note_eliminatoire_edit"
+                    android:layout_height="wrap_content" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:hint="Test 1"
-            android:layout_marginTop="5dp"
-
-            android:background="@drawable/search_outline"
-            android:layout_width="match_parent"
-            android:inputType="number"
-            android:padding="10dp"
-            android:id="@+id/test1_edit"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:background="@drawable/search_outline"
-            android:layout_marginTop="5dp"
-  android:text="Test 2"
-            android:layout_width="match_parent"
-            android:padding="10dp"
-            android:inputType="number"
-            android:id="@+id/test2_edit"
-            android:layout_height="wrap_content" />
-
-
-        <EditText
-            android:text="Participation"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/search_outline"
-            android:layout_width="match_parent"
-            android:padding="10dp"
-            android:inputType="number"
-            android:id="@+id/participation_edit"
-            android:layout_height="wrap_content" />
-
-        <EditText
-            android:layout_marginTop="5dp"
-            android:hint="Abscence"
-            android:background="@drawable/search_outline"
-            android:layout_width="match_parent"
-            android:padding="10dp"
-            android:inputType="number"
-            android:id="@+id/abscence_edit"
-            android:layout_height="match_parent" />
-    <Button
-
-        android:onClick="Update"
-
-        android:id="@+id/edit"
-        android:text="modifier"
-        android:background="@drawable/search_outline"
-        android:layout_marginTop="10dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
+        <Button
+            android:onClick="Update"
+            android:id="@+id/edit"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="end"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Modifier le module"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            />
 </LinearLayout>

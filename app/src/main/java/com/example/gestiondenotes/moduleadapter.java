@@ -1,6 +1,8 @@
 package com.example.gestiondenotes;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +11,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -46,7 +54,12 @@ public class moduleadapter extends ArrayAdapter<Module_users> {
             public void onClick(View v) {
                 Intent i = new Intent(getContext(),Group_act.class);
                 i.putExtra("id",module_users.getId());
-                getContext().startActivity(i); }});
+                i.putExtra("test1", module_users.formule.getTest1()) ;
+                i.putExtra("test2", module_users.formule.getTest2()) ;
+                i.putExtra("absence",module_users.formule.getAbscence());
+                i.putExtra("participation",module_users.formule.getParticipation());
+                getContext().startActivity(i);
+            }});
         // update module
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,18 +69,40 @@ public class moduleadapter extends ArrayAdapter<Module_users> {
                 i.putExtra("coeff",module_users.getCoef());
                 i.putExtra("note eliminatoire",module_users.getNote_eliminatoire());
                 i.putExtra("id",module_users.getId());
-                i.putExtra("test1",module_users.formule.getTest1());
-                i.putExtra("test2",module_users.formule.getTest2());
-                i.putExtra("absence",module_users.formule.getAbscence());
-                i.putExtra("participation",module_users.formule.getParticipation());
                 getContext().startActivity(i); }});
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // supression
-                db_ref = FirebaseDatabase.getInstance().getReference();
-                db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(
-                        module_users.getId()).removeValue();
+                MaterialAlertDialogBuilder m = new MaterialAlertDialogBuilder(getContext());
+                m.setTitle("Attention");
+                m.setMessage("Êtes-vous sûr de vouloir supprimer?");
+                m.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        db_ref = FirebaseDatabase.getInstance().getReference();
+                        db_ref.child("Module_users").child(FirebaseAuth.getInstance().getCurrentUser().getUid()).child(
+                                module_users.getId()).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Toast.makeText(getContext(),"supprimer avec succès",Toast.LENGTH_LONG).show();
+                                }else {
+                                    Toast.makeText(getContext(),task.getException().getMessage(),
+                                            Toast.LENGTH_LONG).show();
+
+                                }
+                            }
+                        });
+                    }
+                });
+                m.setNegativeButton("Non", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    //
+                    }
+                });
+m.show();
             }});
         return convertView;
     }

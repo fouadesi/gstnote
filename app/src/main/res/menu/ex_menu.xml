@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-<item android:title="item1"
+<item
+    android:title="Se déconnecter"
+    android:tooltipText="Deconnecter"
     android:id="@+id/Disconnect"
-    android:icon="@drawable/ic_exit_to_app_black_24dp"
-    app:showAsAction="ifRoom"
+    android:iconTint="@drawable/ic_exit_to_app_black_24dp"
     />
+    <item
+
+        android:title="Aide"
+        android:tooltipText="Deconnecter"
+        android:id="@+id/help"
+        android:icon="@drawable/ic_exit_to_app_black_24dp"
+        />
 </menu>
